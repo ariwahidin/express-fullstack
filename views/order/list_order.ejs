@@ -1,0 +1,29 @@
+<ul class="product-offer-list">
+    <% orders.forEach(order=> { %>
+        <li>
+            <div class="product-box" style="font-size: 10px !important;">
+                <a href="#" class="product-image">
+                    <img src="/assets/images/grocery/product/truck.png" class="img-fluid" alt="">
+                </a>
+                <div class="product-content">
+                    <div>
+                        <a href="#">
+                            <h5 class="name"><%= order.cust_name%></h5>
+                        </a>
+                        <h5 class="category">
+                            <%= order.delivery_no %>
+                        </h5>
+                        <h5 class="price">
+                            <%= order.order_id %>
+                        </h5>
+                    </div>
+                    <div>
+                        <span>
+                            <%= order.order_date %>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <% }) %>
+</ul>

@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="multikit">
+    <meta name="keywords" content="multikit">
+    <title>Sign In - My TMS</title>
+    <meta name="theme-color" content="#ff8d2f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="msapplication-TileColor" content="#FFFFFF">
+    <link rel="icon" href="/assets/svg/yusen.svg" type="image/x-icon">
+    <!-- <link rel="manifest" href="/assets/manifest.json"> -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100;200;300;400;500;600;700;800;900&display=swap">
+    <link rel="stylesheet" href="/assets/css/vendors/bootstrap.css">
+    <link rel="stylesheet" href="/assets/css/normalize.min.css">
+    <link rel="stylesheet" href="/assets/css/remixicon.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
+</head>
+
+<body class="grocery-color public-san-body">
+    <!-- Loader Box Start -->
+    <div class="min-loader-wrapper">
+        <img src="/assets/svg/yusen.svg" class="img-fluid loader" alt="">
+        <div class="loader-section grocery-color section-left"></div>
+        <div class="loader-section grocery-color section-right"></div>
+    </div>
+    <!-- Loader Box End -->
+
+    <!-- authentication start -->
+    <div style="background-image: none !important;" class="grocery-authentication">
+        <div class="custom-container">
+            <div class="logo-content">
+                <img src="/assets/svg/yusen.svg" class="img-fluid logo" alt="">
+                <p>Smart Solutions for Your Delivery Management, Control Your Deliveries at Your Fingertips, Bringing
+                    Transparency to Every Step.</p>
+            </div>
+            <div class="auth-box">
+                <div class="auth-title">
+                    <h4>Login Account
+                        <span style="font-size: 12px; color: red;">
+                            <%= error ? error : '' %>
+                        </span>
+                    </h4>
+
+                </div>
+
+                <form class="form-style-7" action="<%=baseUrl%>/auth/login" method="post">
+                    <div class="form-box mb-19">
+                        <input type="text" class="form-control" placeholder="Username" id="username" name="username"
+                            value="<%=error ? username : ''%>" required>
+                        <i class="ri-user-line"></i>
+                    </div>
+                    <div class="form-box mb-2">
+                        <input type="password" class="form-control" placeholder="Password" id="password" name="password"
+                            value="<%=error ? password : ''%>" required>
+                        <i class="ri-lock-line"></i>
+                    </div>
+                    <button type="submit" class="grocery-btn theme-btn">Login</button>
+                </form>
+
+                <!-- <h5 class="guest-button">
+                    <a href="/index.html">Continue as guest</a>
+                </h5> -->
+            </div>
+        </div>
+    </div>
+    <!-- authentication end -->
+
+    <!-- spacing start -->
+    <div class="grocery-bottom-spacing"></div>
+    <!-- spacing end -->
+
+    <script src="/assets/js/vendors/bootstrap/bootstrap.bundle.min.js" is:inline></script>
+    <script src="/assets/js/loader.js" is:inline></script>
+    <script src="/assets/js/script.js" is:inline></script>
+    <script src="/assets/js/jquery-3.7.0.js" is:inline></script>
+    <!-- <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then(function (registration) {
+                    console.log('Service Worker registered with scope:', registration.scope);
+                }).catch(function (error) {
+                    console.log('Service Worker registration failed:', error);
+                });
+        }
+    </script> -->
+</body>
+
+</html>

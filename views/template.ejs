@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="multikit">
+    <meta name="keywords" content="multikit">
+    <title>
+        <%= title %>
+    </title>
+    <!-- <link rel="manifest" href="https://themes.pixelstrap.net/multikit/manifest.json"> -->
+    <meta name="theme-color" content="#ff8d2f">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="multikit">
+    <!-- <meta name="msapplication-TileImage" content="https://themes.pixelstrap.net/multikit<%=baseUrl%>/assets/images/favicon/1.svg"> -->
+    <meta name="msapplication-TileColor" content="#FFFFFF">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- <link rel="icon" href="https://themes.pixelstrap.net/multikit<%=baseUrl%>/assets/images/favicon/3.svg" type="image/x-icon"> -->
+    <!-- <link rel="shortcut icon" href="https://themes.pixelstrap.net/multikit/" type="image/x-icon"> -->
+
+    <!-- Google font css link  -->
+    <link rel="preconnect" href="https://fonts.googleapis.com/">
+    <link rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@100;200;300;400;500;600;700;800;900&amp;display=swap">
+
+    <!-- Bootstrap css -->
+    <link id="rtl-link" rel="stylesheet" type="text/css" href="<%=baseUrl%>/assets/css/vendors/bootstrap.css">
+
+    <!-- Loader Normalize css -->
+    <link rel="stylesheet" type="text/css" href="<%=baseUrl%>/assets/css/normalize.min.css">
+
+    <!-- Remix Icon css -->
+    <link rel="stylesheet" type="text/css" href="<%=baseUrl%>/assets/css/remixicon.css">
+
+    <!-- Style css -->
+    <link id="change-link" rel="stylesheet" type="text/css" href="<%=baseUrl%>/assets/css/style.css">
+
+    <script src="<%=baseUrl%>/assets/js/jquery-3.7.0.js"></script>
+
+    <style>
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            /* Warna hitam dengan opasitas 0.7 */
+            z-index: 9999;
+            /* Menempatkan latar belakang di atas konten */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Kode CSS untuk animasi spinner yang Anda sebutkan sebelumnya */
+        .lds-roller {
+            display: inline-block;
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+
+        .lds-roller div {
+            animation: lds-roller 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+            transform-origin: 40px 40px;
+        }
+
+        .lds-roller div:after {
+            content: " ";
+            display: block;
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #fff;
+            margin: -4px 0 0 -4px;
+        }
+
+        .lds-roller div:nth-child(1) {
+            animation-delay: -0.036s;
+        }
+
+        .lds-roller div:nth-child(1):after {
+            top: 63px;
+            left: 63px;
+        }
+
+        .lds-roller div:nth-child(2) {
+            animation-delay: -0.072s;
+        }
+
+        .lds-roller div:nth-child(2):after {
+            top: 68px;
+            left: 56px;
+        }
+
+        .lds-roller div:nth-child(3) {
+            animation-delay: -0.108s;
+        }
+
+        .lds-roller div:nth-child(3):after {
+            top: 71px;
+            left: 48px;
+        }
+
+        .lds-roller div:nth-child(4) {
+            animation-delay: -0.144s;
+        }
+
+        .lds-roller div:nth-child(4):after {
+            top: 72px;
+            left: 40px;
+        }
+
+        .lds-roller div:nth-child(5) {
+            animation-delay: -0.18s;
+        }
+
+        .lds-roller div:nth-child(5):after {
+            top: 71px;
+            left: 32px;
+        }
+
+        .lds-roller div:nth-child(6) {
+            animation-delay: -0.216s;
+        }
+
+        .lds-roller div:nth-child(6):after {
+            top: 68px;
+            left: 24px;
+        }
+
+        .lds-roller div:nth-child(7) {
+            animation-delay: -0.252s;
+        }
+
+        .lds-roller div:nth-child(7):after {
+            top: 63px;
+            left: 17px;
+        }
+
+        .lds-roller div:nth-child(8) {
+            animation-delay: -0.288s;
+        }
+
+        .lds-roller div:nth-child(8):after {
+            top: 56px;
+            left: 12px;
+        }
+
+        @keyframes lds-roller {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+
+</head>
+
+
+<body class="grocery-color public-san-body">
+
+
+
+    <div class="pLoading" style="display: none;">
+        <div class="overlay">
+            <div class="lds-roller">
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function stopLoading() {
+            var divLoading = document.querySelector(".pLoading");
+            divLoading.style.display = "none";
+        }
+
+        function startLoading() {
+            var divLoading = document.querySelector(".pLoading");
+            divLoading.style.display = "block";
+        }
+
+        function loadingMenu() {
+            startLoading();
+            setTimeout(stopLoading, 3000);
+        }
+
+        // loadingMenu();
+    </script>
+
+
+    <!-- Loader Box Start -->
+    <div class="min-loader-wrapper">
+        <!-- <img src="https://themes.pixelstrap.net/multikit<%=baseUrl%>/assets/images/favicon/3.svg" class="img-fluid loader" alt=""> -->
+        <img src="<%=baseUrl%>/assets/svg/yusen.svg" class="img-fluid loader" alt="">
+        <div class="loader-section grocery-color section-left"></div>
+        <div class="loader-section grocery-color section-right"></div>
+    </div>
+    <!-- Loader Box End -->
+
+    <!-- header Start -->
+    <header class="header-style-6">
+        <div class="left-header">
+            <button type="button" class="btn menu-btn" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
+                <i class="ri-menu-2-line"></i>
+            </button>
+            <a href="index.html">
+                <img src="<%=baseUrl%>/assets/svg/yusen.svg" class="img-fluid" alt=""
+                    style="width: 80px !important; height: 25px;">
+
+            </a>
+        </div>
+
+        <div class="right-header">
+            <a href="address.html" class="btn location-btn">
+                <i class="ri-map-pin-2-line"></i> Bastrop, Texas</a>
+            <a href="profile.html" class="profile-image">
+                <img src="<%=baseUrl%>/assets/images/grocery/dp.jpg" class="img-fluid" alt="">
+            </a>
+        </div>
+    </header>
+    <!-- header End -->
+
+    <!-- BEGIN CONTENT -->
+
+    <main>
+        <%- include(body) %>
+    </main>
+
+    <!-- END CONTENT -->
+
+
+
+    <!-- Side Menu Offcanvas Start -->
+    <div class="offcanvas offcanvas-start grocery-sidemenu" tabindex="-1" id="sideMenu">
+        <div class="offcanvas-body">
+            <div class="profile-box">
+                <a href="profile.html" class="profile-img">
+                    <img src="<%=baseUrl%>/assets/images/grocery/dp.jpg" class="img-fluid" alt="">
+                </a>
+                <div class="profile-content">
+                    <h4>Paige Turner</h4>
+                    <h5>paigeturner@gmail.com</h5>
+                </div>
+            </div>
+
+            <ul class="menu-list">
+                <li>
+                    <a href="<%=baseUrl%>/dashboard"><i class="ri-file-list-2-line"></i> Menu Utama</a>
+                </li>
+                <li>
+                    <a href="<%=baseUrl%>/order"><i class="ri-file-list-2-line"></i> Order</a>
+                </li>
+                <li>
+                    <a href="<%=baseUrl%>/location/search"><i class="ri-file-list-2-line"></i> Cari Alamat</a>
+                </li>
+                <!-- <li>
+                    <a href="wishlist.html"><i class="ri-heart-line"></i> Your Wishlist</a>
+                </li>
+                <li>
+                    <a href="payment.html"><i class="ri-bank-card-line"></i> Payment</a>
+                </li>
+                <li>
+                    <a href="save-address.html"><i class="ri-map-pin-5-line"></i> Saved Address</a>
+                </li>
+                <li>
+                    <a href="language.html"><i class="ri-file-list-2-line"></i> Language</a>
+                </li>
+                <li>
+                    <a href="notification.html"><i class="ri-notification-4-line"></i> Notification</a>
+                </li>
+                <li>
+                    <a href="setting.html"><i class="ri-settings-3-line"></i> Settings</a>
+                </li> -->
+            </ul>
+
+            <a href="<%=baseUrl%>/auth/logout" class="sidebar-btn grocery-btn white-btn">Logout</a>
+        </div>
+    </div>
+    <!-- Side Menu Offcanvas End -->
+
+
+
+    <!-- Bootstrap js-->
+    <script src="<%=baseUrl%>/assets/js/vendors/bootstrap/bootstrap.bundle.min.js"></script>
+
+    <!-- Loader js -->
+    <script src="<%=baseUrl%>/assets/js/loader.js"></script>
+
+    <!-- Theme js-->
+    <script src="<%=baseUrl%>/assets/js/script.js"></script>
+</body>
+
+</html>

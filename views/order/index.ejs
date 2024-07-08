@@ -1,0 +1,69 @@
+<!-- Search Section Start -->
+<section>
+    <div class="custom-container">
+        <form class="form-style-7">
+            <div class="form-box search-box mb-19">
+                <input type="text" class="form-control" id="search" placeholder="Search DN/SPK/Customer">
+                <i class="ri-search-line"></i>
+                <!-- <i class="ri-mic-line mic-icon"></i> -->
+            </div>
+        </form>
+    </div>
+</section>
+<!-- Search Section End -->
+
+
+<!-- Offer Section Start -->
+<section>
+    <div class="title mb-10 px-15">
+        <h4>Result : <span id="spResult">0</span></h4>
+        <%= baseUrl %>
+    </div>
+    <div class="custom-container">
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" role="tabpanel" tabindex="0" id="divOrder">
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+
+        let debounceTimer;
+
+        console.log("<%= baseUrl %>");
+
+        function getOrder(search = null) {
+            // $('#loading').show()
+            $.post('order/getorder', {
+                search
+            }, function (response) {
+
+                console.log();
+
+                console.log(response);
+
+
+                $('#divOrder').html(response.content);
+                // $('#spResult').text(response.rows)
+                // $('#loading').hide();
+            }, 'json');
+        }
+
+        $('#search').on('keyup', function () {
+            clearTimeout(debounceTimer);
+            let search = $(this).val();
+            debounceTimer = setTimeout(function () {
+                if (search.length > 3) {
+                    getOrder(search);
+                }
+            }, 1000);
+        });
+
+        $('#divOrder').on('click', '.product-box', function () {
+            window.location.href = 'order/tracking'
+        })
+    })
+</script>
