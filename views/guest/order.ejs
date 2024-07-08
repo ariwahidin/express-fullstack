@@ -9,31 +9,48 @@
 
 <section>
     <div class="map-section">
-        <div style="max-height: 350px;" id="map"></div>
+        <div style="max-height: 300px;" id="map"></div>
     </div>
 </section>
-<!-- <section>
-    <div style="margin-top: 10px;" class="custom-container">
-        <form class="form-style-7" id="formSearch">
-            <div style="margin-bottom:5px;" class="form-box search-box">
-                <input type="text" class="form-control" id="search" placeholder="Masukan nama tempat">
-                <i class="ri-search-line"></i>
-            </div>
-        </form>
-    </div>
-    <div class="title mb-10 px-15">
-        <h5>Result : <span id="spResult">0</span></h5>
-    </div>
-    <div style="min-height: 100px;
-    max-height: 200px;
-    overflow: scroll;" class="custom-container">
-        <div class="tab-content" id="pills-tabContent">
-            <div class="tab-pane fade show active" role="tabpanel" tabindex="0" id="divResult">
 
-            </div>
+<section>
+    <div id="divResult">
+        <div style="text-align: center;">
+            <span>Result : 0</span>
         </div>
+        <div class="custom-container" style="padding-top: 10px; max-height: 200px; overflow: auto;">
+            <ul class="cart-box-list">
+
+                <% for(let i = 0; i< 10 ; i++){ %>
+
+                <li>
+                    <div class="cart-box">
+                        <div class="cart-left-box">
+                            <a href="product.html" class="product-image">
+                                <img src="../assets/images/grocery/product/15.png" class="img-fluid" alt="">
+                            </a>
+                            <div class="product-name">
+                                <h5>
+                                    <a href="product.html">Assorted Capsicum</a>
+                                </h5>
+                                <h6>500g</h6>
+                            </div>
+                        </div>
+                        <div class="cart-right-box">
+                            <h5>$25.00</h5>
+                            <button class="remove-button btn">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                </li>
+                <%}%>
+                
+            </ul>
+        </div>
+        <hr>
     </div>
-</section> -->
+</section>
 
 <div class="mobile-style-6">
     <ul style="justify-content: center">
@@ -137,20 +154,11 @@
     $(document).ready(function(){
         var map, marker, userLat, userLon, userAddress;
 
-
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(showPosition, showError);
             } else {
                 alert("Geolocation is not supported by this browser.");
             }
-
-            // $('#btnCenter').on('click', function() {
-            //     if (navigator.geolocation) {
-            //         navigator.geolocation.getCurrentPosition(showPosition, showError);
-            //     } else {
-            //         alert("Geolocation is not supported by this browser.");
-            //     }
-            // });
 
             function initializeMap(lat, lon) {
                 if (!map) {
