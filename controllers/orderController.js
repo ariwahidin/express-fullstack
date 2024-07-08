@@ -3,6 +3,7 @@ const db = require('../database');
 const renderWithLayout = require('../helpers/renderWithLayout');
 
 exports.index = (req, res) => {
+    console.log(req.user);
     return renderWithLayout(res, 'order/index', { title: 'Order' });
 };
 

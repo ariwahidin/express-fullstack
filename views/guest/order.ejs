@@ -1,0 +1,502 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Map link -->
+<link rel="stylesheet" type="text/css" href="<%=baseUrl%>/assets/css/leaflet.css">
+<script src="<%=baseUrl%>/assets/js/leaflet.js"></script>
+
+
+
+<section>
+    <div class="map-section">
+        <div style="max-height: 350px;" id="map"></div>
+    </div>
+</section>
+<!-- <section>
+    <div style="margin-top: 10px;" class="custom-container">
+        <form class="form-style-7" id="formSearch">
+            <div style="margin-bottom:5px;" class="form-box search-box">
+                <input type="text" class="form-control" id="search" placeholder="Masukan nama tempat">
+                <i class="ri-search-line"></i>
+            </div>
+        </form>
+    </div>
+    <div class="title mb-10 px-15">
+        <h5>Result : <span id="spResult">0</span></h5>
+    </div>
+    <div style="min-height: 100px;
+    max-height: 200px;
+    overflow: scroll;" class="custom-container">
+        <div class="tab-content" id="pills-tabContent">
+            <div class="tab-pane fade show active" role="tabpanel" tabindex="0" id="divResult">
+
+            </div>
+        </div>
+    </div>
+</section> -->
+
+<div class="mobile-style-6">
+    <ul style="justify-content: center">
+        <li>
+            <a href="javascript:void(0)" id="scanSPK" class="mobile-box">
+                <i class="ri-qr-scan-2-line"></i>
+                <h6>Scan SPK</h6>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+
+
+<!-- <div class="offcanvas offcanvas-bottom h-auto" tabindex="-1" id="editOffcanvas">
+    <div class="offcanvas-header">
+        <h3 class="offcanvas-title w-75">Add Location</h3>
+        <button type="button" class="btn-close p-0 m-0" data-bs-dismiss="offcanvas"></button>
+    </div>
+    <div class="offcanvas-body pt-0">
+        <form class="row g-3 form-style-7 wo-icon" id="formAddLocation">
+            <div class="col-12">
+                <label for="inputState" class="form-label">BU</label>
+                <select class="form-select" id="in_bu" required>
+                    <option value="" selected>Choose...</option>
+                    <option value="SPKNV">Navya</option>
+                </select>
+            </div>
+            <div class="col-12">
+                <label for="inputAddress2" class="form-label">Customer Name</label>
+                <select class="form-select" id="in_customer_name" required>
+                    <option value="" selected>Choose...</option>
+                </select>
+            </div>
+            <div class="col-5">
+                <label for="inputAddress2" class="form-label">Latitude</label>
+                <input style="max-width: 150px;" type="text" class="form-control-sm" id="in_latitude" readonly>
+            </div>
+            <div class="col-1"></div>
+            <div class="col-5">
+                <label for="inputAddress2" class="form-label">Longitude</label>
+                <input style="max-width: 150px;" type="text" class="form-control-sm" id="in_longitude" readonly>
+            </div>
+            <div class="col-12">
+                <label for="inputCity" class="form-label">Actual Location</label>
+                <textarea type="text" class="form-control" id="in_actual_location" readonly></textarea>
+            </div>
+            <div class="d-flex align-items-center mt-4 gap-3">
+                <a href="#" class="btn border-btn grocery-btn theme-btn" data-bs-dismiss="offcanvas">Cancel</a>
+                <button type="submit" class="btn grocery-btn theme-btn">Save</button>
+            </div>
+        </form>
+    </div>
+</div> -->
+
+<!-- <div class="modal fade delete-modal theme-modal" id="modalSelectCustomer">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="modal-track-spk">
+            <div class="modal-header">
+                <h5 class="modal-title" id="">Pilih Customer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow: auto; max-height: 300px;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-theme btn-light btnUpdateOrder">Select</button>
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="modal fade delete-modal theme-modal" id="qrScannerModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="modal-track-spk">
+            <div class="modal-header">
+                <h5 class="modal-title" id="">Scan SPK</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body" style="overflow: auto; max-height: 300px; text-align: center;">
+                <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>
+                <canvas id="canvas" hidden style="width: 300px; height: 250px;"></canvas>
+                <div id="output" hidden>
+                    <div id="outputMessage">No QR code detected.</div>
+                    <div hidden><b>Data:</b> <span id="outputData"></span></div>
+                </div>
+            </div>
+            <!-- <div class="modal-footer">
+                <button type="button" class="btn btn-theme btn-light btnUpdateOrder">Select</button>
+            </div> -->
+        </div>
+    </div>
+</div>
+<script src="<%= baseUrl %>/qr_scanner/docs/jsQR.js"></script>
+<script>
+
+    $(document).ready(function(){
+        var map, marker, userLat, userLon, userAddress;
+
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError);
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+
+            // $('#btnCenter').on('click', function() {
+            //     if (navigator.geolocation) {
+            //         navigator.geolocation.getCurrentPosition(showPosition, showError);
+            //     } else {
+            //         alert("Geolocation is not supported by this browser.");
+            //     }
+            // });
+
+            function initializeMap(lat, lon) {
+                if (!map) {
+                    // Initialize the map
+                    map = L.map('map').setView([lat, lon], 13); // 13 is the zoom level
+
+                    // Add the OpenStreetMap tiles
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    }).addTo(map);
+
+                    // Add a marker to the map
+                    marker = L.marker([lat, lon]).addTo(map);
+                } else {
+                    map.setView([lat, lon], 13);
+                    marker.setLatLng([lat, lon]);
+                }
+            }
+
+            function showPosition(position) {
+                var lat = position.coords.latitude;
+                var lon = position.coords.longitude;
+
+                initializeMap(lat, lon);
+
+                var geocodeURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+
+                $.getJSON(geocodeURL, function(data) {
+                    if (data && data.address) {
+                        var address = data.address;
+                        var city = address.city || address.town || address.village;
+                        var city_district = address.city_district;
+                        var country = address.country;
+                        var country_code = address.country_code;
+                        var industrial = address.industrial;
+                        var region = address.region;
+                        var postcode = address.postcode;
+                        var address_name = data.display_name;
+
+                        userAddress = data.display_name;
+                        userLon = data.lon;
+                        userLat = data.lat;
+
+                        $('#spanCountry').text(city_district + ', ' + country);
+                        $('#spanFullAddress').text(address_name);
+
+                        // Update marker popup with address
+                        marker.bindPopup(`<b>Your location :</b> ${data.display_name}`).openPopup();
+
+                        // Adjust the map view to center slightly above the marker position
+                        var offsetLat = lat - 0; // Adjust this value to move the map center
+                        map.setView([offsetLat, lon], 13);
+                    } else {
+                        alert("Geocode was not successful for the following reason: " + data.error);
+                    }
+                });
+            }
+
+            function showError(error) {
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert("Pengguna menolak permintaan Geolokasi.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert("Location information is unavailable.");
+                        break;
+                    case error.TIMEOUT:
+                        alert("The request to get user location timed out.");
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        alert("An unknown error occurred.");
+                        break;
+                }
+            }
+    
+            $('#scanSPK').on('click', function(){
+                $('#qrScannerModal').modal('show');
+            });
+    
+        });
+
+
+    $(document).ready(function() {
+        var video = document.createElement("video");
+        var canvasElement = document.getElementById("canvas");
+        var canvas = canvasElement.getContext("2d");
+        var loadingMessage = document.getElementById("loadingMessage");
+        var outputContainer = document.getElementById("output");
+        var outputMessage = document.getElementById("outputMessage");
+        var outputData = document.getElementById("outputData");
+        var stream;
+
+        function drawLine(begin, end, color) {
+            canvas.beginPath();
+            canvas.moveTo(begin.x, begin.y);
+            canvas.lineTo(end.x, end.y);
+            canvas.lineWidth = 4;
+            canvas.strokeStyle = color;
+            canvas.stroke();
+        }
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment"
+                }
+            }).then(function(localStream) {
+                stream = localStream;
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+                video.play();
+                requestAnimationFrame(tick);
+            }).catch(function(err) {
+                console.error("Error accessing camera: " + err);
+            });
+        }
+
+        function stopCamera() {
+            if (stream) {
+                let tracks = stream.getTracks();
+                tracks.forEach(function(track) {
+                    track.stop();
+                });
+            }
+        }
+
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                loadingMessage.hidden = true;
+                canvasElement.hidden = false;
+                outputContainer.hidden = false;
+
+                canvasElement.height = video.videoHeight;
+                canvasElement.width = video.videoWidth;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+                if (code) {
+                    drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+                    drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+                    drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+                    drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+                    outputMessage.hidden = true;
+                    outputData.parentElement.hidden = false;
+                    outputData.innerText = code.data;
+
+                    window.location.href = code.data;
+                    return;
+                } else {
+                    outputMessage.hidden = false;
+                    outputData.parentElement.hidden = true;
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+
+        $('#qrScannerModal').on('show.bs.modal', function() {
+            startCamera();
+        });
+
+        $('#qrScannerModal').on('hide.bs.modal', function() {
+            stopCamera();
+            loadingMessage.hidden = false;
+            canvasElement.hidden = true;
+            outputContainer.hidden = true;
+            outputMessage.hidden = true;
+            outputData.parentElement.hidden = true;
+            outputData.innerText = "";
+        });
+    });
+
+
+    // $(document).ready(function () {
+    //     let debounceTimer;
+    //     $('#search').on('keyup', function () {
+    //         clearTimeout(debounceTimer); // Menghapus timer sebelumnya
+    //         debounceTimer = setTimeout(function () {
+    //             let keywords = $('#search').val();
+    //             if (keywords.length > 5) {
+    //                 getAddress(keywords);
+    //             }
+    //         }, 300); // Menjalankan fungsi setelah 300 milidetik
+    //     });
+
+    //     function getAddress(keywords) {
+    //         keywords = keywords.replace(/ /g, "+");
+    //         $.get("https://nominatim.openstreetmap.org/search.php?q=" + keywords + "&format=jsonv2", {}, function (response) {
+
+    //             $('#spResult').text(response.length);
+    //             $('#divResult').empty();
+    //             $('#divResult').append(`<ul class="product-offer-list">`);
+    //             response.forEach(function (item) {
+    //                 let li = `
+    //                                     <li class="address-item" data-lat="${item.lat}" data-lng="${item.lon}">
+    //                                         <div class="product-box" style="font-size: 10px !important;">
+    //                                             <div class="product-content">
+    //                                                 <div>
+    //                                                     <h5 style="font-size:12px;" class="name"> ${item.display_name}</h5>
+    //                                                     <span><i class="ri-map-pin-line"></i> Lat : ${item.lat} </span><span>&nbsp; Lon : ${item.lon}</span>
+    //                                                     <hr style="margin-top:5px; margin-bottom:5px;">
+    //                                                 </div>
+    //                                             </div>
+    //                                         </div>
+    //                                     </li
+                                
+    //                         `;
+    //                 $('#divResult').append(li);
+    //             })
+    //             $('#divResult').append(`</ul>`);
+    //         }, 'json');
+    //     }
+
+    //     $('#formSearch').on('submit', function (e) {
+    //         e.preventDefault();
+    //         let keywords = $('#search').val();
+    //         if (keywords.length > 5) {
+    //             getAddress(keywords);
+    //         }
+    //     })
+
+    //     $('#in_bu').on('change', function () {
+    //         let bu = $(this).val();
+    //         if (bu.trim() != '') {
+    //             startLoading();
+    //             $.post('getJSONCustomer', {
+    //                 bu
+    //             }, function (response) {
+    //                 stopLoading();
+    //                 let inSelect = $('#in_customer_name');
+    //                 inSelect.empty();
+    //                 inSelect.append(`<option value="" selected>Choose...</option>`);
+    //                 if (response.data.length > 0) {
+    //                     response.data.forEach((item) => {
+    //                         let option = `<option value="${item.cust_id}">${item.cust_name}</option>`;
+    //                         inSelect.append(option);
+    //                     });
+    //                 }
+    //             }, 'JSON');
+    //         }
+    //     });
+
+    //     $('#formAddLocation').on('submit', function (e) {
+    //         e.preventDefault();
+    //         if ($('#in_latitude').val() == '') {
+    //             Swal.fire({
+    //                 icon: 'warning',
+    //                 title: '',
+    //                 text: 'Titik lokasi harus ditentukan'
+    //             });
+    //         } else {
+    //             let dataToPost = {
+    //                 bu: $('#in_bu').val(),
+    //                 cust_id: $('#in_customer_name').val(),
+    //                 lat: $('#in_latitude').val(),
+    //                 lon: $('#in_longitude').val(),
+    //                 actual_location: $('#in_actual_location').text(),
+    //             }
+    //             startLoading();
+    //             $.post("saveLocationCustomer", dataToPost, function (response) {
+    //                 stopLoading();
+    //                 if (response.success == true) {
+    //                     Swal.fire({
+    //                         icon: 'success',
+    //                         title: '',
+    //                         text: response.message
+    //                     });
+
+    //                     // menutup form edit
+    //                     var offcanvasElement = document.getElementById('editOffcanvas');
+    //                     var offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
+    //                     offcanvasInstance.hide();
+    //                 } else {
+    //                     Swal.fire({
+    //                         icon: 'error',
+    //                         title: '',
+    //                         text: response.message
+    //                     });
+    //                 }
+    //             }, 'JSON');
+    //         }
+    //     });
+
+    // });
+
+    // $(document).ready(function () {
+    //     // Inisialisasi peta
+    //     var map = L.map('map').setView([-6.12885785, 106.87079323031739], 13);
+
+    //     // Tambahkan layer tile dari OpenStreetMap
+    //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    //         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    //     }).addTo(map);
+
+    //     // Variabel untuk menyimpan marker dan koordinat
+    //     var singleMarker;
+    //     var lat, lng;
+
+    //     // Fungsi untuk memindahkan marker
+    //     function moveMarker(lat, lng) {
+    //         // Hapus marker yang ada jika sudah ada
+    //         if (singleMarker) {
+    //             map.removeLayer(singleMarker);
+    //         }
+
+
+    //         var geocodeURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+    //         $.getJSON(geocodeURL, function (data) {
+    //             if (data && data.address) {
+
+    //                 // Tambahkan marker baru
+    //                 singleMarker = L.marker([lat, lng]).addTo(map)
+    //                     .bindPopup(data.display_name)
+    //                     .openPopup();
+
+    //                 // Simpan koordinat pada variabel
+    //                 console.log("Koordinat tersimpan: Latitude = " + lat + ", Longitude = " + lng);
+    //                 $('#in_latitude').val(lat);
+    //                 $('#in_longitude').val(lng);
+    //                 $('#in_actual_location').text(data.display_name);
+
+    //                 // Pindahkan peta ke koordinat baru
+    //                 map.setView([lat, lng], 13);
+
+    //             } else {
+    //                 alert("Geocode was not successful for the following reason: " + data.error);
+    //             }
+    //         });
+
+
+    //     }
+
+    //     // Event listener untuk klik pada daftar alamat
+    //     $('#divResult').on('click', '.address-item', function () {
+    //         lat = $(this).data('lat');
+    //         lng = $(this).data('lng');
+    //         moveMarker(lat, lng);
+    //     });
+
+    //     // Tambahkan marker awal saat peta diklik
+    //     map.on('click', function (e) {
+    //         lat = e.latlng.lat;
+    //         lng = e.latlng.lng;
+    //         moveMarker(lat, lng);
+    //     });
+    // });
+</script>

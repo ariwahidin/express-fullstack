@@ -1,6 +1,8 @@
 const moment = require('moment');
+const config = require('../config');
 const db = require('../database');
 const renderWithLayout = require('../helpers/renderWithLayout');
+const baseUrl = config.baseUrl;
 
 exports.search = (req, res) => {
     return renderWithLayout(res, 'location/search', { title: 'Search location' });

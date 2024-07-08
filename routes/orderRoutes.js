@@ -3,6 +3,7 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const config = require('../config');
 const orderController = require('../controllers/orderController');
+const baseUrl = config.baseUrl;
 
 const authenticateJWT = (req, res, next) => {
     const token = req.cookies.token;
@@ -10,13 +11,13 @@ const authenticateJWT = (req, res, next) => {
     if (token) {
         jwt.verify(token, config.jwtSecret, (err, user) => {
             if (err) {
-                return res.redirect('/auth/login');
+                return res.redirect(baseUrl + '/auth/login');
             }
             req.user = user;
             next();
         });
     } else {
-        res.redirect('/auth/login');
+        res.redirect(baseUrl + '/auth/login');
     }
 };
 

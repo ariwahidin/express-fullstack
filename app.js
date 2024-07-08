@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const dashboardRoutes = require('./routes/dashboardRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const locationRoutes = require('./routes/locationRoutes');
+const guestController = require('./routes/guestRoutes');
 
 const app = express();
 const baseUrl = config.baseUrl;
@@ -25,6 +26,7 @@ app.use(baseUrl + '/dashboard', dashboardRoutes);
 app.use(baseUrl + '/order', orderRoutes);
 app.use(baseUrl + '/location', locationRoutes);
 app.use(baseUrl + '/auth', authRoutes);
+app.use(baseUrl + '/guest', guestController);
 console.log(baseUrl);
 
 
