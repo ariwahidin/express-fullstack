@@ -18,48 +18,50 @@
         <div style="text-align: center;">
             <span>Result : <%= order.length%></span>
         </div>
-        <div class="custom-container" style="padding-top: 10px; margin-bottom: 50px; overflow: auto; max-height: 350px;">
+        <div class="custom-container"
+            style="padding-top: 10px; margin-bottom: 50px; overflow: auto; max-height: 350px;">
             <ul class="cart-box-list">
 
-                <% if(order.length >0 ){ %>
-                <% order.forEach(item => { %>
-                <li>
-                    <div class="cart-box">
-                        <div class="cart-left-box">
-                            <div class="product-name">
-                                <h5>
-                                    <a href="#"><%= item.cust_name%></a>
-                                </h5>
-                                <h6><%="SPK : " + item.order_id + ", DO : " +  item.delivery_no%></h6>
+                <% if(order.length>0 ){ %>
+                    <% order.forEach(item=> { %>
+                        <li>
+                            <div class="cart-box">
+                                <div class="cart-left-box">
+                                    <div class="product-name">
+                                        <h5>
+                                            <a href="#">
+                                                <%= item.cust_name%>
+                                            </a>
+                                        </h5>
+                                        <h6>
+                                            <%="SPK : " + item.order_id + " , DO : " +  item.delivery_no%></h6>
                             </div>
                         </div>
-                        <div class="cart-right-box">
-                            <button 
-                            data-delivery-no="<%= item.delivery_no %>" 
-                            data-cust-addr="<%= item.cust_addr1 %>" 
-                            data-ship-to="<%= item.ship_to %>" 
-                            data-order-id="<%= item.order_id %>" 
-                            data-cust-name="<%= item.cust_name %>" 
-                            class="remove-button btn btnTrackSPK">
-                                <i class="ri-road-map-line"></i>
-                            </button>
-                            <button 
-                            data-delivery-no="<%= item.delivery_no %>" 
-                            data-cust-addr="<%= item.cust_addr1 %>" 
-                            data-ship-to="<%= item.ship_to %>" 
-                            data-order-id="<%= item.order_id %>" 
-                            data-cust-name="<%= item.cust_name %>" 
-                            class="remove-button btn btnTrack">
-                                <i class="ri-edit-2-fill"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <hr style="margin-top: 5px; margin-bottom: 0px;">
-                </li>
-                <%})%>
-                <%}%>
+                        <div class=" cart-right-box">
+                                                <button data-delivery-no="<%= item.delivery_no %>"
+                                                    data-cust-addr="<%= item.cust_addr1 %>"
+                                                    data-ship-to="<%= item.ship_to %>"
+                                                    data-order-id="<%= item.order_id %>"
+                                                    data-cust-name="<%= item.cust_name %>"
+                                                    class="remove-button btn btnTrackSPK">
+                                                    <i class="ri-road-map-line"></i>
+                                                </button>
+                                                <button data-delivery-no="<%= item.delivery_no %>"
+                                                    data-cust-addr="<%= item.cust_addr1 %>"
+                                                    data-ship-to="<%= item.ship_to %>"
+                                                    data-order-id="<%= item.order_id %>"
+                                                    data-cust-name="<%= item.cust_name %>"
+                                                    class="remove-button btn btnTrack">
+                                                    <i class="ri-edit-2-fill"></i>
+                                                </button>
+                                    </div>
+                                </div>
+                                <hr style="margin-top: 5px; margin-bottom: 0px;">
+                        </li>
+                        <%})%>
+                            <%}%>
 
-                
+
             </ul>
         </div>
         <hr>
@@ -121,23 +123,34 @@
     </div>
 </div> -->
 
-<!-- <div class="modal fade delete-modal theme-modal" id="modalSelectCustomer">
+<div class="modal fade delete-modal theme-modal" id="modalTrackSPK">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" id="modal-track-spk">
             <div class="modal-header">
-                <h5 class="modal-title" id="">Pilih Customer</h5>
+                <h5 class="modal-title" id="h5Cust">VANS AMBARUKMO PLAZA YOGYA</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal">
                     <i class="ri-close-line"></i>
                 </button>
             </div>
             <div class="modal-body" style="overflow: auto; max-height: 300px;">
+                <ul class="delivered-list" id="ulHistory">
+                    <li>
+                        <h5><i class="ri-truck-line"></i> <span style="font-weight: bolder;">Pelabuhan</span> </h5>
+                        <span style="font-size: 12px;"><i class="ri-map-pin-fill"></i> Jalan Tol Cibitungâ€“Cilincing,
+                            Kawasan Industri dan Peti Kemas, Cilincing, North Jakarta, Special Region of Jakarta, West
+                            Java, Java, 14150, Indonesia</span>
+                        <span style="font-size: 12px;"><i class="ri-map-pin-time-line"></i> 2024-05-18 18:00:00 <i
+                                class="ri-map-pin-user-line"></i> Dayana </span>
+                        <hr style="margin: 5px 0px;">
+                    </li>
+                </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-theme btn-light btnUpdateOrder">Select</button>
+                <button type="button" class="btn btn-theme btn-light btnUpdateOrder">Update Status Order</button>
             </div>
         </div>
     </div>
-</div> -->
+</div>
 
 <div class="modal fade delete-modal theme-modal" id="qrScannerModal">
     <div class="modal-dialog modal-dialog-centered">
@@ -149,7 +162,8 @@
                 </button>
             </div>
             <div class="modal-body" style="overflow: auto; max-height: 300px; text-align: center;">
-                <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>
+                <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)
+                </div>
                 <canvas id="canvas" hidden style="width: 250px; height: 250px;"></canvas>
                 <div id="output" hidden>
                     <div id="outputMessage">No QR code detected.</div>
@@ -162,101 +176,25 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade delete-modal theme-modal" id="modalArrival">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="modal-conf">
+        </div>
+    </div>
+</div>
+
 <script src="<%= baseUrl %>/qr_scanner/docs/jsQR.js"></script>
 <script>
 
     // Geo location
-    $(document).ready(function(){
-        var map, marker, userLat, userLon, userAddress;
+    $(document).ready(function () {
 
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(showPosition, showError);
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
 
-            function initializeMap(lat, lon) {
-                if (!map) {
-                    // Initialize the map
-                    map = L.map('map').setView([lat, lon], 13); // 13 is the zoom level
-
-                    // Add the OpenStreetMap tiles
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                    }).addTo(map);
-
-                    // Add a marker to the map
-                    marker = L.marker([lat, lon]).addTo(map);
-                } else {
-                    map.setView([lat, lon], 13);
-                    marker.setLatLng([lat, lon]);
-                }
-            }
-
-            function showPosition(position) {
-                var lat = position.coords.latitude;
-                var lon = position.coords.longitude;
-
-                initializeMap(lat, lon);
-
-                var geocodeURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
-
-                $.getJSON(geocodeURL, function(data) {
-                    if (data && data.address) {
-                        var address = data.address;
-                        var city = address.city || address.town || address.village;
-                        var city_district = address.city_district;
-                        var country = address.country;
-                        var country_code = address.country_code;
-                        var industrial = address.industrial;
-                        var region = address.region;
-                        var postcode = address.postcode;
-                        var address_name = data.display_name;
-
-                        userAddress = data.display_name;
-                        userLon = data.lon;
-                        userLat = data.lat;
-
-                        $('#spanCountry').text(city_district + ', ' + country);
-                        $('#spanFullAddress').text(address_name);
-
-                        // Update marker popup with address
-                        marker.bindPopup(`<b>Your location :</b> ${data.display_name}`).openPopup();
-
-                        // Adjust the map view to center slightly above the marker position
-                        var offsetLat = lat - 0; // Adjust this value to move the map center
-                        map.setView([offsetLat, lon], 13);
-                    } else {
-                        alert("Geocode was not successful for the following reason: " + data.error);
-                    }
-                });
-            }
-
-            function showError(error) {
-                switch (error.code) {
-                    case error.PERMISSION_DENIED:
-                        alert("Pengguna menolak permintaan Geolokasi.");
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        alert("Location information is unavailable.");
-                        break;
-                    case error.TIMEOUT:
-                        alert("The request to get user location timed out.");
-                        break;
-                    case error.UNKNOWN_ERROR:
-                        alert("An unknown error occurred.");
-                        break;
-                }
-            }
-    
-            $('#scanSPK').on('click', function(){
-                $('#qrScannerModal').modal('show');
-            });
-    
-        });
+    });
 
     // Qr Scanner
-    $(document).ready(function() {
+    $(document).ready(function () {
         var video = document.createElement("video");
         var canvasElement = document.getElementById("canvas");
         var canvas = canvasElement.getContext("2d");
@@ -265,6 +203,93 @@
         var outputMessage = document.getElementById("outputMessage");
         var outputData = document.getElementById("outputData");
         var stream;
+
+
+        var map, marker, userLat, userLon, userAddress;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+
+        function initializeMap(lat, lon) {
+            if (!map) {
+                // Initialize the map
+                map = L.map('map').setView([lat, lon], 13); // 13 is the zoom level
+
+                // Add the OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                // Add a marker to the map
+                marker = L.marker([lat, lon]).addTo(map);
+            } else {
+                map.setView([lat, lon], 13);
+                marker.setLatLng([lat, lon]);
+            }
+        }
+
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+
+            initializeMap(lat, lon);
+
+            var geocodeURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+
+            $.getJSON(geocodeURL, function (data) {
+                if (data && data.address) {
+                    var address = data.address;
+                    var city = address.city || address.town || address.village;
+                    var city_district = address.city_district;
+                    var country = address.country;
+                    var country_code = address.country_code;
+                    var industrial = address.industrial;
+                    var region = address.region;
+                    var postcode = address.postcode;
+                    var address_name = data.display_name;
+
+                    userAddress = data.display_name;
+                    userLon = data.lon;
+                    userLat = data.lat;
+
+                    $('#spanCountry').text(city_district + ', ' + country);
+                    $('#spanFullAddress').text(address_name);
+
+                    // Update marker popup with address
+                    marker.bindPopup(`<b>Your location :</b> ${data.display_name}`).openPopup();
+
+                    // Adjust the map view to center slightly above the marker position
+                    var offsetLat = lat - 0; // Adjust this value to move the map center
+                    map.setView([offsetLat, lon], 13);
+                } else {
+                    alert("Geocode was not successful for the following reason: " + data.error);
+                }
+            });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Pengguna menolak permintaan Geolokasi.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        $('#scanSPK').on('click', function () {
+            $('#qrScannerModal').modal('show');
+        });
 
         function drawLine(begin, end, color) {
             canvas.beginPath();
@@ -280,13 +305,13 @@
                 video: {
                     facingMode: "environment"
                 }
-            }).then(function(localStream) {
+            }).then(function (localStream) {
                 stream = localStream;
                 video.srcObject = stream;
                 video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
                 video.play();
                 requestAnimationFrame(tick);
-            }).catch(function(err) {
+            }).catch(function (err) {
                 console.error("Error accessing camera: " + err);
             });
         }
@@ -294,7 +319,7 @@
         function stopCamera() {
             if (stream) {
                 let tracks = stream.getTracks();
-                tracks.forEach(function(track) {
+                tracks.forEach(function (track) {
                     track.stop();
                 });
             }
@@ -322,8 +347,6 @@
                     outputData.parentElement.hidden = false;
                     outputData.innerText = code.data;
 
-                    // window.location.href = code.data;
-                    // console.log(code.data);
                     getSPK(code.data);
                     return;
                 } else {
@@ -334,11 +357,11 @@
             requestAnimationFrame(tick);
         }
 
-        $('#qrScannerModal').on('show.bs.modal', function() {
+        $('#qrScannerModal').on('show.bs.modal', function () {
             startCamera();
         });
 
-        $('#qrScannerModal').on('hide.bs.modal', function() {
+        $('#qrScannerModal').on('hide.bs.modal', function () {
             stopCamera();
             loadingMessage.hidden = false;
             canvasElement.hidden = true;
@@ -348,186 +371,172 @@
             outputData.innerText = "";
         });
 
-        function getSPK(url){
-            $.get(url, function(response){
+        function getSPK(hasilScan) {
 
-            }, 'JSON');
+            var scanResult = hasilScan;
+            var currentUrl = window.location.origin + window.location.pathname;
+
+            try {
+                var url = new URL(scanResult);
+                var urlScanned = url.origin + url.pathname;
+
+                if (urlScanned === currentUrl) {
+                    window.location.href = scanResult;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'URL tidak sesuai',
+                        text: urlScanned
+                    });
+                }
+            } catch (error) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'URL tidak sesuai',
+                    text: urlScanned
+                });
+            }
         }
+
+        $('#divResult').on('click', '.btnTrackSPK', function () {
+            startLoading();
+            let order_id = $(this).data('order-id');
+            let ship_to = $(this).data('ship-to');
+            let cust_name = $(this).data('cust-name');
+            let cust_addr = $(this).data('cust-addr');
+            let delivery_no = $(this).data('delivery-no');
+
+            let url = "<%= baseUrl %>/guest/order/status";
+            $.post(url, {
+                order_id,
+                ship_to
+            }, function (response) {
+                stopLoading();
+                $('#h5Cust').text(cust_name);
+
+                let history = response.data;
+                let ul = $('#ulHistory');
+                ul.empty();
+
+                if (history.length > 0) {
+                    history.forEach(item => {
+                        let list = `<li>
+                            <h5><i class="ri-truck-line"></i> <span style="font-weight: bolder;">${item.lokasi_terkini}</span> </h5>
+                            <span style="font-size: 12px;"><i class="ri-map-pin-fill"></i>${item.address}</span>
+                            <span style="font-size: 12px;"><i class="ri-map-pin-time-line"></i> ${item.created_date} <i class="ri-map-pin-user-line"></i> ${item.created_by} <i class="ri-progress-8-fill"></i> ${item.order_status} </span>
+                            <hr style="margin: 5px 0px;">
+                        </li>`;
+
+                        ul.append(list);
+                    });
+                } else {
+                    let list = `<li><h5>Data not found</h5></li>`;
+
+                    ul.append(list);
+                }
+                $('#modalTrackSPK').modal('show');
+
+
+                let driverName = '';
+                if (localStorage.getItem('t_driverName')) {
+                    driverName = localStorage.getItem('t_driverName');
+                }
+                $('#modal-conf').empty();
+                let elem = `
+                    <form id="formUpdateTrack">
+                    <div class="modal-header">
+                        <h4 class="modal-title">Update order status:</h4>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal">
+                            <i class="ri-close-line"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="delete-list" id="conf-cust">
+                            <li>
+                                <h5>
+                                    <a href="#">${cust_name}</a>
+                                </h5>
+                                <h6>${delivery_no}</h6>
+                                <h6>${cust_addr}</h6>
+                            </li>
+                            <li>
+                                <div class="mt-3 chatting-form-control">
+                                    <label>Barang sampai di :</label>
+                                    <input type="text" class="form-control form-control-border" placeholder="Terminal/Pelabuhan/Bandara etc.." id="lokasi_terkini" value="" required autocomplete="off">
+                                </div>
+                            </li>
+                            <li>
+                                <div class="mt-3 chatting-form-control">
+                                    <label>Nama petugas :</label>
+                                    <input type="hidden" id="in_spk" value="${order_id}">
+                                    <input type="hidden" id="in_ship_to" value="${ship_to}">
+                                    <input type="hidden" id="delivery_no" value="${delivery_no}">
+                                    <input type="text" class="form-control form-control-border" placeholder="Masukan nama anda/petugas/driver" id="user_name" value="${driverName}" required autocomplete="off">
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="on the way">Update Perjalanan</button>
+                        <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods arrived">Barang Sampai</button>
+                        <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods unloading">Barang Dibongkar</button>
+                    </div>
+                    </form>`;
+                $('#modal-conf').html(elem);
+            }, 'JSON');
+
+
+        })
+
+        $('#modalTrackSPK').on('click', '.btnUpdateOrder', function () {
+            $('#modalTrackSPK').modal('hide');
+            $('#modalArrival').modal('show');
+        })
+
+        var lastClickedButton;
+        $('#modal-conf').on('click', '.btnSubmit', function () {
+            lastClickedButton = $(this);
+        });
+        $('#modal-conf').on('submit', '#formUpdateTrack', function (e) {
+            e.preventDefault();
+            if (lastClickedButton) {
+                var status = lastClickedButton.data('submit');
+
+                let dataToPost = {
+                    user_address: userAddress,
+                    user_lat: userLat,
+                    user_lon: userLon,
+                    user_name: $('#user_name').val(),
+                    spk: $('#in_spk').val(),
+                    ship_to: $('#in_ship_to').val(),
+                    delivery_no: $('#delivery_no').val(),
+                    lokasi_terkini: $('#lokasi_terkini').val(),
+                    status: status
+                }
+                startLoading();
+                let url = "<%= baseUrl %>/guest/order/save";
+                $.post(url, dataToPost, function (response) {
+                    if (response.success == true) {
+                        stopLoading();
+
+                        Swal.fire({
+                            icon: "success",
+                            title: response.message,
+                            showConfirmButton: false,
+                            timer: 1200
+                        });
+
+                        $('#modalArrival').modal('hide');
+                        // getBoxOrder();
+                    } else {
+                        $('#modalArrival').modal('hide');
+                        // getBoxOrder();
+                        stopLoading();
+                    }
+                }, 'json');
+            }
+        })
+
+
     });
-
-
-    // $(document).ready(function () {
-    //     let debounceTimer;
-    //     $('#search').on('keyup', function () {
-    //         clearTimeout(debounceTimer); // Menghapus timer sebelumnya
-    //         debounceTimer = setTimeout(function () {
-    //             let keywords = $('#search').val();
-    //             if (keywords.length > 5) {
-    //                 getAddress(keywords);
-    //             }
-    //         }, 300); // Menjalankan fungsi setelah 300 milidetik
-    //     });
-
-    //     function getAddress(keywords) {
-    //         keywords = keywords.replace(/ /g, "+");
-    //         $.get("https://nominatim.openstreetmap.org/search.php?q=" + keywords + "&format=jsonv2", {}, function (response) {
-
-    //             $('#spResult').text(response.length);
-    //             $('#divResult').empty();
-    //             $('#divResult').append(`<ul class="product-offer-list">`);
-    //             response.forEach(function (item) {
-    //                 let li = `
-    //                                     <li class="address-item" data-lat="${item.lat}" data-lng="${item.lon}">
-    //                                         <div class="product-box" style="font-size: 10px !important;">
-    //                                             <div class="product-content">
-    //                                                 <div>
-    //                                                     <h5 style="font-size:12px;" class="name"> ${item.display_name}</h5>
-    //                                                     <span><i class="ri-map-pin-line"></i> Lat : ${item.lat} </span><span>&nbsp; Lon : ${item.lon}</span>
-    //                                                     <hr style="margin-top:5px; margin-bottom:5px;">
-    //                                                 </div>
-    //                                             </div>
-    //                                         </div>
-    //                                     </li
-                                
-    //                         `;
-    //                 $('#divResult').append(li);
-    //             })
-    //             $('#divResult').append(`</ul>`);
-    //         }, 'json');
-    //     }
-
-    //     $('#formSearch').on('submit', function (e) {
-    //         e.preventDefault();
-    //         let keywords = $('#search').val();
-    //         if (keywords.length > 5) {
-    //             getAddress(keywords);
-    //         }
-    //     })
-
-    //     $('#in_bu').on('change', function () {
-    //         let bu = $(this).val();
-    //         if (bu.trim() != '') {
-    //             startLoading();
-    //             $.post('getJSONCustomer', {
-    //                 bu
-    //             }, function (response) {
-    //                 stopLoading();
-    //                 let inSelect = $('#in_customer_name');
-    //                 inSelect.empty();
-    //                 inSelect.append(`<option value="" selected>Choose...</option>`);
-    //                 if (response.data.length > 0) {
-    //                     response.data.forEach((item) => {
-    //                         let option = `<option value="${item.cust_id}">${item.cust_name}</option>`;
-    //                         inSelect.append(option);
-    //                     });
-    //                 }
-    //             }, 'JSON');
-    //         }
-    //     });
-
-    //     $('#formAddLocation').on('submit', function (e) {
-    //         e.preventDefault();
-    //         if ($('#in_latitude').val() == '') {
-    //             Swal.fire({
-    //                 icon: 'warning',
-    //                 title: '',
-    //                 text: 'Titik lokasi harus ditentukan'
-    //             });
-    //         } else {
-    //             let dataToPost = {
-    //                 bu: $('#in_bu').val(),
-    //                 cust_id: $('#in_customer_name').val(),
-    //                 lat: $('#in_latitude').val(),
-    //                 lon: $('#in_longitude').val(),
-    //                 actual_location: $('#in_actual_location').text(),
-    //             }
-    //             startLoading();
-    //             $.post("saveLocationCustomer", dataToPost, function (response) {
-    //                 stopLoading();
-    //                 if (response.success == true) {
-    //                     Swal.fire({
-    //                         icon: 'success',
-    //                         title: '',
-    //                         text: response.message
-    //                     });
-
-    //                     // menutup form edit
-    //                     var offcanvasElement = document.getElementById('editOffcanvas');
-    //                     var offcanvasInstance = bootstrap.Offcanvas.getInstance(offcanvasElement);
-    //                     offcanvasInstance.hide();
-    //                 } else {
-    //                     Swal.fire({
-    //                         icon: 'error',
-    //                         title: '',
-    //                         text: response.message
-    //                     });
-    //                 }
-    //             }, 'JSON');
-    //         }
-    //     });
-
-    // });
-
-    // $(document).ready(function () {
-    //     // Inisialisasi peta
-    //     var map = L.map('map').setView([-6.12885785, 106.87079323031739], 13);
-
-    //     // Tambahkan layer tile dari OpenStreetMap
-    //     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    //         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-    //     }).addTo(map);
-
-    //     // Variabel untuk menyimpan marker dan koordinat
-    //     var singleMarker;
-    //     var lat, lng;
-
-    //     // Fungsi untuk memindahkan marker
-    //     function moveMarker(lat, lng) {
-    //         // Hapus marker yang ada jika sudah ada
-    //         if (singleMarker) {
-    //             map.removeLayer(singleMarker);
-    //         }
-
-
-    //         var geocodeURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
-
-    //         $.getJSON(geocodeURL, function (data) {
-    //             if (data && data.address) {
-
-    //                 // Tambahkan marker baru
-    //                 singleMarker = L.marker([lat, lng]).addTo(map)
-    //                     .bindPopup(data.display_name)
-    //                     .openPopup();
-
-    //                 // Simpan koordinat pada variabel
-    //                 console.log("Koordinat tersimpan: Latitude = " + lat + ", Longitude = " + lng);
-    //                 $('#in_latitude').val(lat);
-    //                 $('#in_longitude').val(lng);
-    //                 $('#in_actual_location').text(data.display_name);
-
-    //                 // Pindahkan peta ke koordinat baru
-    //                 map.setView([lat, lng], 13);
-
-    //             } else {
-    //                 alert("Geocode was not successful for the following reason: " + data.error);
-    //             }
-    //         });
-
-
-    //     }
-
-    //     // Event listener untuk klik pada daftar alamat
-    //     $('#divResult').on('click', '.address-item', function () {
-    //         lat = $(this).data('lat');
-    //         lng = $(this).data('lng');
-    //         moveMarker(lat, lng);
-    //     });
-
-    //     // Tambahkan marker awal saat peta diklik
-    //     map.on('click', function (e) {
-    //         lat = e.latlng.lat;
-    //         lng = e.latlng.lng;
-    //         moveMarker(lat, lng);
-    //     });
-    // });
 </script>
