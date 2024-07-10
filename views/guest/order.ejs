@@ -16,35 +16,49 @@
 <section>
     <div id="divResult">
         <div style="text-align: center;">
-            <span>Result : 0</span>
+            <span>Result : <%= order.length%></span>
         </div>
-        <div class="custom-container" style="padding-top: 10px; max-height: 200px; overflow: auto;">
+        <div class="custom-container" style="padding-top: 10px; margin-bottom: 50px; overflow: auto; max-height: 350px;">
             <ul class="cart-box-list">
 
-                <% for(let i = 0; i< 10 ; i++){ %>
-
+                <% if(order.length >0 ){ %>
+                <% order.forEach(item => { %>
                 <li>
                     <div class="cart-box">
                         <div class="cart-left-box">
-                            <a href="product.html" class="product-image">
-                                <img src="../assets/images/grocery/product/15.png" class="img-fluid" alt="">
-                            </a>
                             <div class="product-name">
                                 <h5>
-                                    <a href="product.html">Assorted Capsicum</a>
+                                    <a href="#"><%= item.cust_name%></a>
                                 </h5>
-                                <h6>500g</h6>
+                                <h6><%="SPK : " + item.order_id + ", DO : " +  item.delivery_no%></h6>
                             </div>
                         </div>
                         <div class="cart-right-box">
-                            <h5>$25.00</h5>
-                            <button class="remove-button btn">
-                                <i class="ri-delete-bin-line"></i>
+                            <button 
+                            data-delivery-no="<%= item.delivery_no %>" 
+                            data-cust-addr="<%= item.cust_addr1 %>" 
+                            data-ship-to="<%= item.ship_to %>" 
+                            data-order-id="<%= item.order_id %>" 
+                            data-cust-name="<%= item.cust_name %>" 
+                            class="remove-button btn btnTrackSPK">
+                                <i class="ri-road-map-line"></i>
+                            </button>
+                            <button 
+                            data-delivery-no="<%= item.delivery_no %>" 
+                            data-cust-addr="<%= item.cust_addr1 %>" 
+                            data-ship-to="<%= item.ship_to %>" 
+                            data-order-id="<%= item.order_id %>" 
+                            data-cust-name="<%= item.cust_name %>" 
+                            class="remove-button btn btnTrack">
+                                <i class="ri-edit-2-fill"></i>
                             </button>
                         </div>
                     </div>
+                    <hr style="margin-top: 5px; margin-bottom: 0px;">
                 </li>
+                <%})%>
                 <%}%>
+
                 
             </ul>
         </div>
@@ -136,7 +150,7 @@
             </div>
             <div class="modal-body" style="overflow: auto; max-height: 300px; text-align: center;">
                 <div id="loadingMessage">🎥 Unable to access video stream (please make sure you have a webcam enabled)</div>
-                <canvas id="canvas" hidden style="width: 300px; height: 250px;"></canvas>
+                <canvas id="canvas" hidden style="width: 250px; height: 250px;"></canvas>
                 <div id="output" hidden>
                     <div id="outputMessage">No QR code detected.</div>
                     <div hidden><b>Data:</b> <span id="outputData"></span></div>
@@ -151,6 +165,7 @@
 <script src="<%= baseUrl %>/qr_scanner/docs/jsQR.js"></script>
 <script>
 
+    // Geo location
     $(document).ready(function(){
         var map, marker, userLat, userLon, userAddress;
 
@@ -240,7 +255,7 @@
     
         });
 
-
+    // Qr Scanner
     $(document).ready(function() {
         var video = document.createElement("video");
         var canvasElement = document.getElementById("canvas");
@@ -307,7 +322,9 @@
                     outputData.parentElement.hidden = false;
                     outputData.innerText = code.data;
 
-                    window.location.href = code.data;
+                    // window.location.href = code.data;
+                    // console.log(code.data);
+                    getSPK(code.data);
                     return;
                 } else {
                     outputMessage.hidden = false;
@@ -330,6 +347,12 @@
             outputData.parentElement.hidden = true;
             outputData.innerText = "";
         });
+
+        function getSPK(url){
+            $.get(url, function(response){
+
+            }, 'JSON');
+        }
     });
 
 

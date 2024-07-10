@@ -3,12 +3,13 @@ const db = require('../database');
 const renderWithLayout = require('../helpers/renderWithLayout');
 
 exports.index = (req, res) => {
-    console.log(req.user);
-    return renderWithLayout(res, 'order/index', { title: 'Order' });
+    const user = req.user;
+    return renderWithLayout(res, 'order/index', { user: user, title: 'Order' });
 };
 
 exports.getorder = async (req, res) => {
     const { search } = req.body;
+
 
     let sql = `
         SELECT a.order_id, a.ship_to, a.delivery_no, a.destination_city, 
@@ -41,8 +42,8 @@ exports.getorder = async (req, res) => {
         rows.forEach(order => {
             order.order_date = moment(order.order_date).format('YYYY-MM-DD');
         });
-       
-        
+
+
         // Render template EJS menjadi string
         res.render('order/list_order', { orders: rows }, (err, html) => {
             if (err) {

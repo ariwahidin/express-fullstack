@@ -5,7 +5,8 @@ const renderWithLayout = require('../helpers/renderWithLayout');
 const baseUrl = config.baseUrl;
 
 exports.search = (req, res) => {
-    return renderWithLayout(res, 'location/search', { title: 'Search location' });
+    const user = req.user;
+    return renderWithLayout(res, 'location/search', { user: user, title: 'Cari Alamat' });
 };
 
 exports.getCustomer = async (req, res) => {

@@ -220,19 +220,20 @@
             <button type="button" class="btn menu-btn" data-bs-toggle="offcanvas" data-bs-target="#sideMenu">
                 <i class="ri-menu-2-line"></i>
             </button>
-            <a href="index.html">
-                <img src="<%=baseUrl%>/assets/svg/yusen.svg" class="img-fluid" alt=""
-                    style="width: 80px !important; height: 25px;">
+            <a href="#">
+                <%= title %>
+                    <!-- <img src="<%=baseUrl%>/assets/svg/yusen.svg" class="img-fluid" alt=""
+                    style="width: 80px !important; height: 25px;"> -->
 
             </a>
         </div>
 
         <div class="right-header">
             <a href="address.html" class="btn location-btn">
-                <i class="ri-map-pin-2-line"></i> Bastrop, Texas</a>
-            <a href="profile.html" class="profile-image">
-                <img src="<%=baseUrl%>/assets/images/grocery/dp.jpg" class="img-fluid" alt="">
-            </a>
+                <!-- <i class="ri-map-pin-2-line"></i> Bastrop, Texas</a> -->
+                <a href="profile.html" class="profile-image">
+                    <img src="<%=baseUrl%>/assets/images/grocery/dp.jpg" class="img-fluid" alt="">
+                </a>
         </div>
     </header>
     <!-- header End -->
@@ -255,12 +256,15 @@
                     <img src="<%=baseUrl%>/assets/images/grocery/dp.jpg" class="img-fluid" alt="">
                 </a>
                 <div class="profile-content">
-                    <h4>Paige Turner</h4>
-                    <h5>paigeturner@gmail.com</h5>
+                    <h4>
+                        <%= user.username %>
+                    </h4>
+                    <!-- <h5>paigeturner@gmail.com</h5> -->
                 </div>
             </div>
 
             <ul class="menu-list">
+
                 <li>
                     <a href="<%=baseUrl%>/dashboard"><i class="ri-file-list-2-line"></i> Menu Utama</a>
                 </li>
@@ -293,7 +297,11 @@
                 </li> -->
             </ul>
 
-            <a href="<%=baseUrl%>/auth/logout" class="sidebar-btn grocery-btn white-btn">Logout</a>
+            <%if(user.username=='Guest' ){%>
+                <a href="<%=baseUrl%>/auth/login" class="sidebar-btn grocery-btn white-btn">Login</a>
+            <%}else{%>
+                <a href="<%=baseUrl%>/auth/logout" class="sidebar-btn grocery-btn white-btn">Logout</a>
+            <%}%>
         </div>
     </div>
     <!-- Side Menu Offcanvas End -->

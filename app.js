@@ -7,6 +7,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const guestController = require('./routes/guestRoutes');
+// const authenticateJWT = require('./middleware/authenticateJWT');
 
 const app = express();
 const baseUrl = config.baseUrl;
@@ -21,6 +22,8 @@ app.use(baseUrl, express.static(path.join(__dirname, 'public')));
 
 app.set('view engine', 'ejs');
 
+// Middleware untuk autentikasi
+// app.use(authenticateJWT);
 app.use(baseUrl + '/', dashboardRoutes);
 app.use(baseUrl + '/dashboard', dashboardRoutes);
 app.use(baseUrl + '/order', orderRoutes);
