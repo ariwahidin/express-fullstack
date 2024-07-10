@@ -1,4 +1,5 @@
 const renderWithLayout = require('../helpers/renderWithLayout');
+const moment = require('moment-timezone');
 const db = require('../database');
 
 exports.getOrder = async (req, res) => {
@@ -70,6 +71,11 @@ exports.getOrderStatus = async (req, res) => {
 
     try {
         const [rows] = await db.execute(sql, [order_id, ship_to]);
+
+        rows.forEach(item =>{
+            item.created_date = moment.utc(item.created_date).tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
+        });
+
         res.status(200).json({ success: true, data: rows });
     } catch (error) {
         console.error(error);
@@ -79,7 +85,7 @@ exports.getOrderStatus = async (req, res) => {
 
 exports.saveOrderStatus = async (req, res) => {
     const { spk, ship_to, delivery_no, lokasi_terkini, status, user_lat, user_lon, user_address, user_name } = req.body;
-    const date = new Date().toISOString().slice(0, 19).replace('T', ' ');
+    const date = moment().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
     // const db = getDbConnection(spk);
 
     // if (!db) {
