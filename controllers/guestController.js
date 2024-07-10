@@ -84,13 +84,10 @@ exports.getOrderStatus = async (req, res) => {
 }
 
 exports.saveOrderStatus = async (req, res) => {
+
+    const imagePath = req.file.path;
     const { spk, ship_to, delivery_no, lokasi_terkini, status, user_lat, user_lon, user_address, user_name } = req.body;
     const date = moment().tz('Asia/Jakarta').format('YYYY-MM-DD HH:mm:ss');
-    // const db = getDbConnection(spk);
-
-    // if (!db) {
-    //     return res.status(400).json({ success: false, message: 'Invalid SPK provided' });
-    // }
 
     const where = {
         order_id: spk,
@@ -106,14 +103,14 @@ exports.saveOrderStatus = async (req, res) => {
             const query = `
                 INSERT INTO order_d_status (
                     order_id, ship_to, delivery_no, lokasi_terkini, 
-                    order_status, lat, lon, address, created_date, created_by
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    order_status, lat, lon, address, created_date, created_by, image_path
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             `;
 
             const values = [
                 spk, ship_to, delivery_no, lokasi_terkini,
                 status, user_lat, user_lon, user_address,
-                date, user_name
+                date, user_name, imagePath
             ];
 
             try {

@@ -141,6 +141,58 @@
 <div class="modal fade delete-modal theme-modal" id="modalArrival">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" id="modal-conf">
+
+            <form id="formUpdateTrack">
+                <div class="modal-header">
+                    <h4 class="modal-title">Update order status:</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <ul class="delete-list" id="conf-cust">
+                        <li>
+                            <h5></h5>
+                            <h6></h6>
+                            <h6></h6>
+                        </li>
+                        <li>
+                            <div class="form-group">
+                                <label for="camera">Gambar:</label>
+                                <video id="camera" width="100%" autoplay></video>
+                                <input type="hidden" id="imageData" name="imageData">
+                            </div>
+                        </li>
+                        <li>
+                            <div class="mt-3 chatting-form-control">
+                                <label>Barang sampai di :</label>
+                                <input type="text" class="form-control form-control-border"
+                                    placeholder="Terminal/Pelabuhan/Bandara etc.." id="lokasi_terkini" value="" required
+                                    autocomplete="off">
+                            </div>
+                        </li>
+                        <li>
+                            <div class="mt-3 chatting-form-control">
+                                <label>Nama petugas :</label>
+                                <input type="hidden" id="in_spk" value="">
+                                <input type="hidden" id="in_ship_to" value="">
+                                <input type="hidden" id="delivery_no" value="">
+                                <input type="text" class="form-control form-control-border"
+                                    placeholder="Masukan nama anda/petugas/driver" id="user_name" value="" required
+                                    autocomplete="off">
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="on the way">Update
+                        Perjalanan</button>
+                    <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods arrived">Barang
+                        Sampai</button>
+                    <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods unloading">Barang
+                        Dibongkar</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -398,56 +450,82 @@
                 $('#modalTrackSPK').modal('show');
 
 
-                let driverName = '';
-                if (localStorage.getItem('t_driverName')) {
-                    driverName = localStorage.getItem('t_driverName');
-                }
-                $('#modal-conf').empty();
-                let elem = `
-                    <form id="formUpdateTrack">
-                    <div class="modal-header">
-                        <h4 class="modal-title">Update order status:</h4>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal">
-                            <i class="ri-close-line"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <ul class="delete-list" id="conf-cust">
-                            <li>
-                                <h5>
-                                    <a href="#">${cust_name}</a>
-                                </h5>
-                                <h6>${delivery_no}</h6>
-                                <h6>${cust_addr}</h6>
-                            </li>
-                            <li>
-                                <div class="mt-3 chatting-form-control">
-                                    <label>Barang sampai di :</label>
-                                    <input type="text" class="form-control form-control-border" placeholder="Terminal/Pelabuhan/Bandara etc.." id="lokasi_terkini" value="" required autocomplete="off">
-                                </div>
-                            </li>
-                            <li>
-                                <div class="mt-3 chatting-form-control">
-                                    <label>Nama petugas :</label>
-                                    <input type="hidden" id="in_spk" value="${order_id}">
-                                    <input type="hidden" id="in_ship_to" value="${ship_to}">
-                                    <input type="hidden" id="delivery_no" value="${delivery_no}">
-                                    <input type="text" class="form-control form-control-border" placeholder="Masukan nama anda/petugas/driver" id="user_name" value="${driverName}" required autocomplete="off">
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="on the way">Update Perjalanan</button>
-                        <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods arrived">Barang Sampai</button>
-                        <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods unloading">Barang Dibongkar</button>
-                    </div>
-                    </form>`;
-                $('#modal-conf').html(elem);
+                // let driverName = '';
+                // if (localStorage.getItem('t_driverName')) {
+                //     driverName = localStorage.getItem('t_driverName');
+                // }
+                // $('#modal-conf').empty();
+                // let elem = `
+                //     <form id="formUpdateTrack">
+                //     <div class="modal-header">
+                //         <h4 class="modal-title">Update order status:</h4>
+                //         <button type="button" class="btn-close" data-bs-dismiss="modal">
+                //             <i class="ri-close-line"></i>
+                //         </button>
+                //     </div>
+                //     <div class="modal-body">
+                //         <ul class="delete-list" id="conf-cust">
+                //             <li>
+                //                 <h5>
+                //                     <a href="#">${cust_name}</a>
+                //                 </h5>
+                //                 <h6>${delivery_no}</h6>
+                //                 <h6>${cust_addr}</h6>
+                //             </li>
+                //             <li>
+                //                 <div class="mt-3 chatting-form-control">
+                //                     <label>Barang sampai di :</label>
+                //                     <input type="text" class="form-control form-control-border" placeholder="Terminal/Pelabuhan/Bandara etc.." id="lokasi_terkini" value="" required autocomplete="off">
+                //                 </div>
+                //             </li>
+                //             <li>
+                //                 <div class="mt-3 chatting-form-control">
+                //                     <label>Nama petugas :</label>
+                //                     <input type="hidden" id="in_spk" value="${order_id}">
+                //                     <input type="hidden" id="in_ship_to" value="${ship_to}">
+                //                     <input type="hidden" id="delivery_no" value="${delivery_no}">
+                //                     <input type="text" class="form-control form-control-border" placeholder="Masukan nama anda/petugas/driver" id="user_name" value="${driverName}" required autocomplete="off">
+                //                 </div>
+                //             </li>
+                //         </ul>
+                //     </div>
+                //     <div class="modal-footer">
+                //         <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="on the way">Update Perjalanan</button>
+                //         <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods arrived">Barang Sampai</button>
+                //         <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods unloading">Barang Dibongkar</button>
+                //     </div>
+                //     </form>`;
+                // $('#modal-conf').html(elem);
+
+                $('#in_spk').val(order_id);
+                $('#in_ship_to').val(ship_to);
+                $('#delivery_no').val(delivery_no);
             }, 'JSON');
 
 
         })
+
+        var video = document.querySelector("#camera");
+        var stream;
+
+        $('#modalArrival').on('shown.bs.modal', function () {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = stream;
+                })
+                .catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
+        });
+
+        $('#modalArrival').on('hidden.bs.modal', function () {
+            if (stream) {
+                let tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        });
 
         $('#modalTrackSPK').on('click', '.btnUpdateOrder', function () {
             $('#modalTrackSPK').modal('hide');
@@ -476,25 +554,73 @@
                 }
                 startLoading();
                 let url = "<%= baseUrl %>/guest/order/save";
-                $.post(url, dataToPost, function (response) {
-                    if (response.success == true) {
-                        stopLoading();
 
-                        Swal.fire({
-                            icon: "success",
-                            title: response.message,
-                            showConfirmButton: false,
-                            timer: 1200
-                        });
 
-                        $('#modalArrival').modal('hide');
-                        // getBoxOrder();
-                    } else {
-                        $('#modalArrival').modal('hide');
-                        // getBoxOrder();
-                        stopLoading();
-                    }
-                }, 'json');
+                var canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth;
+                canvas.height = video.videoHeight;
+                canvas.getContext('2d').drawImage(video, 0, 0);
+                canvas.toBlob(function (blob) {
+                    var formData = new FormData();
+                    formData.append("keterangan", "test");
+                    formData.append("user_address", userAddress);
+                    formData.append("user_lat", userLat);
+                    formData.append("user_lon", userLon);
+                    formData.append("user_name", $('#user_name').val());
+                    formData.append("spk", $('#in_spk').val());
+                    formData.append("ship_to", $('#in_ship_to').val());
+                    formData.append("delivery_no", $('#delivery_no').val());
+                    formData.append("lokasi_terkini", $('#lokasi_terkini').val());
+                    formData.append("status", status);
+                    formData.append("imageData", blob, 'screenshot.png');
+
+                    $.ajax({
+                        type: "POST",
+                        url: url,
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            if (response.success == true) {
+                                stopLoading();
+
+                                Swal.fire({
+                                    icon: "success",
+                                    title: response.message,
+                                    showConfirmButton: false,
+                                    timer: 1200
+                                });
+
+                                $('#modalArrival').modal('hide');
+                            } else {
+                                $('#modalArrival').modal('hide');
+                                stopLoading();
+                            }
+                        },
+                        error: function (error) {
+                            console.error("Error:", error);
+                        }
+                    });
+                }, 'image/png');
+
+
+                // $.post(url, dataToPost, function (response) {
+                //     if (response.success == true) {
+                //         stopLoading();
+
+                //         Swal.fire({
+                //             icon: "success",
+                //             title: response.message,
+                //             showConfirmButton: false,
+                //             timer: 1200
+                //         });
+
+                //         $('#modalArrival').modal('hide');
+                //     } else {
+                //         $('#modalArrival').modal('hide');
+                //         stopLoading();
+                //     }
+                // }, 'json');
             }
         })
 

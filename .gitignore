@@ -2,3 +2,4 @@ node_modules/*
 config.js
 database.js
 public/qr_scanner/node_modules/*
+uploads/*
