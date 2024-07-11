@@ -161,6 +161,8 @@
                                 <label for="camera">Gambar:</label>
                                 <video id="camera" width="100%" autoplay></video>
                                 <input type="hidden" id="imageData" name="imageData">
+                                <button type="button" class="btn-sm btn-secondary" id="switchCamera">Switch
+                                    Camera</button>
                             </div>
                         </li>
                         <li>
@@ -216,6 +218,7 @@
         var outputMessage = document.getElementById("outputMessage");
         var outputData = document.getElementById("outputData");
         var stream;
+        var currentFacingMode = 'environment';
 
 
         var map, marker, userLat, userLon, userAddress;
@@ -531,6 +534,26 @@
             $('#modalTrackSPK').modal('hide');
             $('#modalArrival').modal('show');
         })
+
+        function startCameraKonfirmasi(facingMode) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } })
+                .then(function (mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = stream;
+                })
+                .catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
+        }
+
+        $("#switchCamera").on("click", function () {
+            if (stream) {
+                let tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+            startCameraKonfirmasi(currentFacingMode);
+        });
 
         var lastClickedButton;
         $('#modal-conf').on('click', '.btnSubmit', function () {
