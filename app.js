@@ -21,6 +21,7 @@ const io = socketIo(server);
 const baseUrl = config.baseUrl;
 app.locals.baseUrl = baseUrl; // agar bisa di akses di view
 
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
