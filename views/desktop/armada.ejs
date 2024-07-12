@@ -140,9 +140,20 @@
 <script src="https://cdn.socket.io/4.4.1/socket.io.min.js"></script>
 <script>
     $(document).ready(function () {
-        const socket = io('<%=baseUrl%>', {
-            path: '/py-express/socket.io' // Sesuaikan dengan path socket.io yang Anda atur di server
+
+        const hostname = window.location.protocol + "//" + window.location.host;
+        // console.log(hostname);
+
+        const socket = io(hostname, {
+            path: '<%=baseUrl%>/socket.io' // Sesuaikan dengan path socket.io yang Anda atur di server
         });
+
+        // Gunakan socket seperti biasa
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+
         // Inisialisasi peta
         var map = L.map('map').setView([-6.200000, 106.816666], 10);
 
