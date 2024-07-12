@@ -141,7 +141,7 @@
 <script>
     $(document).ready(function () {
         const socket = io('<%=baseUrl%>', {
-            path: '/socket.io' // Sesuaikan dengan path socket.io yang Anda atur di server
+            path: '<%=baseUrl%>' + '/socket.io' // Sesuaikan dengan path socket.io yang Anda atur di server
         });
         // Inisialisasi peta
         var map = L.map('map').setView([-6.200000, 106.816666], 10);
