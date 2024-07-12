@@ -14,7 +14,11 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const socketIo = require('socket.io');
-const io = socketIo(server);
+// const io = socketIo(server);
+
+const io = socketIo(server, {
+    path: '/py-express/socket.io' // Atur path socket.io sesuai kebutuhan
+});
 
 
 
