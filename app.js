@@ -57,7 +57,6 @@ app.use(baseUrl + '/guest', guestController);
 
 // desktop
 app.use(baseUrl + '/desktop', desktopRoutes);
-
 // API for Asics
 // app.use(baseUrl + '/api/asics');
 

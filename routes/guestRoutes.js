@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {optionalAuthenticateToken} = require('../middleware/authenticateJWT');
+const { optionalAuthenticateToken } = require('../middleware/authenticateJWT');
 const guestController = require('../controllers/guestController');
 const multer = require('multer');
 const path = require('path');
@@ -17,10 +17,15 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-router.get('/order',optionalAuthenticateToken, guestController.getOrder);
-router.post('/order/status',optionalAuthenticateToken, guestController.getOrderStatus);
-router.post('/order/save',optionalAuthenticateToken,  upload.single('imageData'), guestController.saveOrderStatus);
+router.get('/order', optionalAuthenticateToken, guestController.getOrder);
+router.post('/order/status', optionalAuthenticateToken, guestController.getOrderStatus);
+router.post('/order/save', optionalAuthenticateToken, upload.single('imageData'), guestController.saveOrderStatus);
 router.post('/getOrder', guestController.getOrderBySPK);
-router.post('/order/sendLocation',guestController.sendLocation);
+router.post('/order/sendLocation', guestController.sendLocation);
+
+router.get('/testSocket', (req, res) => {
+    req.io.emit('updateArmadas');
+    res.json({ success: true })
+});
 
 module.exports = router;
