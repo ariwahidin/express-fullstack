@@ -9,8 +9,6 @@ exports.index = (req, res) => {
 
 exports.getorder = async (req, res) => {
     const { search } = req.body;
-
-
     let sql = `
         SELECT a.order_id, a.ship_to, a.delivery_no, a.destination_city, 
         b.cust_name, b.cust_addr1, c.order_date

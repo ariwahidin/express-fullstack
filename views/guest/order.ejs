@@ -82,8 +82,6 @@
     </ul>
 </div>
 
-
-
 <div class="modal fade delete-modal theme-modal" id="modalTrackSPK">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" id="modal-track-spk">
@@ -107,7 +105,8 @@
                 </ul>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-theme btn-light btnUpdateOrder">Update Status Order</button>
+                <button type="button" class="btn btn-theme btn-light btnUpdateOrder" id="btnUpdateOrder">Update Status
+                    Order</button>
             </div>
         </div>
     </div>
@@ -131,9 +130,6 @@
                     <div hidden><b>Data:</b> <span id="outputData"></span></div>
                 </div>
             </div>
-            <!-- <div class="modal-footer">
-                <button type="button" class="btn btn-theme btn-light btnUpdateOrder">Select</button>
-            </div> -->
         </div>
     </div>
 </div>
@@ -187,11 +183,14 @@
                     </ul>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="on the way">Update
+                    <button type="submit" class="btn btn-theme btn-light btnSubmit" id="btnUpdatePerjalanan"
+                        data-submit="on the way">Update
                         Perjalanan</button>
-                    <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods arrived">Barang
+                    <button type="submit" class="btn btn-theme btn-light btnSubmit" id="btnUpdateSampai"
+                        data-submit="goods arrived">Barang
                         Sampai</button>
-                    <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods unloading">Barang
+                    <button type="submit" class="btn btn-theme btn-light btnSubmit" id="btnUpdateBongkar"
+                        data-submit="goods unloading">Barang
                         Dibongkar</button>
                 </div>
             </form>
@@ -202,13 +201,6 @@
 <script src="<%= baseUrl %>/qr_scanner/docs/jsQR.js"></script>
 <script>
 
-    // Geo location
-    $(document).ready(function () {
-
-
-    });
-
-    // Qr Scanner
     $(document).ready(function () {
         var video = document.createElement("video");
         var canvasElement = document.getElementById("canvas");
@@ -219,8 +211,6 @@
         var outputData = document.getElementById("outputData");
         var stream;
         var currentFacingMode = 'user';
-
-
         var map, marker, userLat, userLon, userAddress;
 
         if (navigator.geolocation) {
@@ -280,6 +270,7 @@
                     // Adjust the map view to center slightly above the marker position
                     var offsetLat = lat - 0; // Adjust this value to move the map center
                     map.setView([offsetLat, lon], 13);
+                    sendLocationSPK(userLat, userLon, address_name);
                 } else {
                     alert("Geocode was not successful for the following reason: " + data.error);
                 }
@@ -427,12 +418,16 @@
                 order_id,
                 ship_to
             }, function (response) {
+
                 stopLoading();
                 $('#h5Cust').text(cust_name);
 
                 let history = response.data;
                 let ul = $('#ulHistory');
                 ul.empty();
+
+                let isBarangSampai = false;
+                let isBarangBongkar = false;
 
                 if (history.length > 0) {
                     history.forEach(item => {
@@ -444,61 +439,37 @@
                         </li>`;
 
                         ul.append(list);
+
+                        if (item.order_status === 'goods arrived') {
+                            isBarangSampai = true;
+                        }
+
+                        if (item.order_status === 'goods unloading') {
+                            isBarangBongkar = true;
+                        }
                     });
                 } else {
                     let list = `<li><h5>Data not found</h5></li>`;
-
                     ul.append(list);
                 }
+
                 $('#modalTrackSPK').modal('show');
 
 
-                // let driverName = '';
-                // if (localStorage.getItem('t_driverName')) {
-                //     driverName = localStorage.getItem('t_driverName');
-                // }
-                // $('#modal-conf').empty();
-                // let elem = `
-                //     <form id="formUpdateTrack">
-                //     <div class="modal-header">
-                //         <h4 class="modal-title">Update order status:</h4>
-                //         <button type="button" class="btn-close" data-bs-dismiss="modal">
-                //             <i class="ri-close-line"></i>
-                //         </button>
-                //     </div>
-                //     <div class="modal-body">
-                //         <ul class="delete-list" id="conf-cust">
-                //             <li>
-                //                 <h5>
-                //                     <a href="#">${cust_name}</a>
-                //                 </h5>
-                //                 <h6>${delivery_no}</h6>
-                //                 <h6>${cust_addr}</h6>
-                //             </li>
-                //             <li>
-                //                 <div class="mt-3 chatting-form-control">
-                //                     <label>Barang sampai di :</label>
-                //                     <input type="text" class="form-control form-control-border" placeholder="Terminal/Pelabuhan/Bandara etc.." id="lokasi_terkini" value="" required autocomplete="off">
-                //                 </div>
-                //             </li>
-                //             <li>
-                //                 <div class="mt-3 chatting-form-control">
-                //                     <label>Nama petugas :</label>
-                //                     <input type="hidden" id="in_spk" value="${order_id}">
-                //                     <input type="hidden" id="in_ship_to" value="${ship_to}">
-                //                     <input type="hidden" id="delivery_no" value="${delivery_no}">
-                //                     <input type="text" class="form-control form-control-border" placeholder="Masukan nama anda/petugas/driver" id="user_name" value="${driverName}" required autocomplete="off">
-                //                 </div>
-                //             </li>
-                //         </ul>
-                //     </div>
-                //     <div class="modal-footer">
-                //         <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="on the way">Update Perjalanan</button>
-                //         <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods arrived">Barang Sampai</button>
-                //         <button type="submit" class="btn btn-theme btn-light btnSubmit" data-submit="goods unloading">Barang Dibongkar</button>
-                //     </div>
-                //     </form>`;
-                // $('#modal-conf').html(elem);
+                if (isBarangSampai) {
+                    $('#btnUpdatePerjalanan').css("display", "none");
+                    $('#btnUpdateSampai').css("display", "none");
+                } else {
+                    $('#btnUpdatePerjalanan').css("display", "block");
+                    $('#btnUpdateSampai').css("display", "block");
+                }
+
+                if (isBarangBongkar) {
+                    $('#btnUpdateOrder').css("display", "none");
+                } else {
+                    $('#btnUpdateOrder').css("display", "block");
+                }
+
 
                 $('#in_spk').val(order_id);
                 $('#in_ship_to').val(ship_to);
@@ -559,6 +530,7 @@
         $('#modal-conf').on('click', '.btnSubmit', function () {
             lastClickedButton = $(this);
         });
+
         $('#modal-conf').on('submit', '#formUpdateTrack', function (e) {
             e.preventDefault();
             if (lastClickedButton) {
@@ -577,7 +549,6 @@
                 }
                 startLoading();
                 let url = "<%= baseUrl %>/guest/order/save";
-
 
                 var canvas = document.createElement('canvas');
                 canvas.width = video.videoWidth;
@@ -646,6 +617,22 @@
                 // }, 'json');
             }
         })
+
+        function sendLocationSPK(lat, lon, address) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const spk = urlParams.get('spk');
+            let dataToPost = {
+                spk, lat, lon, address
+            }
+
+            if (spk) {
+                $.post("<%=baseUrl%>/guest/order/sendLocation", dataToPost, function(response){
+
+                }, 'JSON');
+            } else {
+                console.log('tidak ada spk');
+            }
+        }
 
 
     });

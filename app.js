@@ -7,33 +7,48 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const guestController = require('./routes/guestRoutes');
-// const authenticateJWT = require('./middleware/authenticateJWT');
+const desktopRoutes = require('./routes/desktopRoutes');
 
 const app = express();
+
+const http = require('http');
+const server = http.createServer(app);
+const socketIo = require('socket.io');
+const io = socketIo(server);
+
+
+
 const baseUrl = config.baseUrl;
 app.locals.baseUrl = baseUrl; // agar bisa di akses di view
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
-console.log(__dirname)
 // app.use(express.static(path.join(__dirname, 'public')));
-app.use(baseUrl, express.static(path.join(__dirname, 'public')));
 
+app.use(baseUrl, express.static(path.join(__dirname, 'public')));
 app.set('view engine', 'ejs');
 
-// Middleware untuk autentikasi
-// app.use(authenticateJWT);
+// Middleware untuk menambahkan io ke request object
+app.use((req, res, next) => {
+    req.io = io;
+    next();
+});
+
 app.use(baseUrl + '/', dashboardRoutes);
 app.use(baseUrl + '/dashboard', dashboardRoutes);
 app.use(baseUrl + '/order', orderRoutes);
 app.use(baseUrl + '/location', locationRoutes);
 app.use(baseUrl + '/auth', authRoutes);
 app.use(baseUrl + '/guest', guestController);
-console.log(baseUrl);
 
 
+// desktop
+app.use(baseUrl + '/desktop', desktopRoutes);
 
-app.listen(config.port, () => {
+// API for Asics
+// app.use(baseUrl + '/api/asics');
+
+server.listen(config.port, () => {
     console.log(`Server is running on port ${config.port}`);
 });

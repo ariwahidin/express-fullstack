@@ -5,3 +5,5 @@ module.exports = function renderWithLayout(res, view, options) {
 
     res.render(options.layout, options);
 };
+
+

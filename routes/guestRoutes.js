@@ -21,5 +21,6 @@ router.get('/order',optionalAuthenticateToken, guestController.getOrder);
 router.post('/order/status',optionalAuthenticateToken, guestController.getOrderStatus);
 router.post('/order/save',optionalAuthenticateToken,  upload.single('imageData'), guestController.saveOrderStatus);
 router.post('/getOrder', guestController.getOrderBySPK);
+router.post('/order/sendLocation',guestController.sendLocation);
 
 module.exports = router;
