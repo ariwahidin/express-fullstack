@@ -152,8 +152,8 @@ exports.sendLocation = async (req, res) => {
         const [hasil] = await db.execute(qryCek, [spk]);
 
         if (hasil.length > 0) {
-            const checkQuery = `SELECT * FROM order_h_status WHERE order_id = ? AND lat = ? AND lon = ?`;
-            const [rows] = await db.execute(checkQuery, [spk, lat, lon]);
+            const checkQuery = `SELECT * FROM order_h_status WHERE order_id = ? AND lat = ? AND lon = ? AND created_at = ?`;
+            const [rows] = await db.execute(checkQuery, [spk, lat, lon, date]);
 
             if (rows.length < 1) {
                 const query = `
