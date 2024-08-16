@@ -7,6 +7,7 @@ const dashboardRoutes = require('./routes/dashboardRoutes');
 const orderRoutes = require('./routes/orderRoutes');
 const locationRoutes = require('./routes/locationRoutes');
 const guestController = require('./routes/guestRoutes');
+const attendanceRoutes = require('./routes/attendanceRoutes');
 const desktopRoutes = require('./routes/desktopRoutes');
 
 const app = express();
@@ -33,9 +34,11 @@ const baseUrl = config.baseUrl;
 app.locals.baseUrl = baseUrl; // agar bisa di akses di view
 
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Atur batas maksimal ukuran payload
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
+
 // app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(baseUrl, express.static(path.join(__dirname, 'public')));
@@ -53,6 +56,7 @@ app.use(baseUrl + '/order', orderRoutes);
 app.use(baseUrl + '/location', locationRoutes);
 app.use(baseUrl + '/auth', authRoutes);
 app.use(baseUrl + '/guest', guestController);
+app.use(baseUrl + '/attendance', attendanceRoutes);
 
 
 // desktop

@@ -8,7 +8,8 @@ const armadaController = require('../controllers/desktop/armadaController');
 
 router.get('/home', homeController.home);
 router.get('/armada', armadaController.index);
-router.post('/armada/getStatusArmada', armadaController.getStatusArmada);
+router.post('/armada/getStatusArmada', armadaController.getOrdersWithDetail);
+router.get('/armada/getOrder', armadaController.getOrdersWithDetail)
 // router.get('/auth/logout', authController.logout);
 // router.post('/order/getorder', auth.authenticateJWT, orderController.getorder);
 

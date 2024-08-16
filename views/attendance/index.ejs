@@ -1,0 +1,546 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<!-- Map link -->
+<link rel="stylesheet" type="text/css" href="<%=baseUrl%>/assets/css/leaflet.css">
+<script src="<%=baseUrl%>/assets/js/leaflet.js"></script>
+
+
+
+<section>
+    <div class="map-section">
+        <div style="max-height: 230px;" id="map"></div>
+    </div>
+</section>
+
+<!-- Order Delivered Box Section Start -->
+<section>
+    <div class="custom-container mt-3">
+        <div class="order-delivered-box">
+            <div class="order-content">
+                <h4>PY-ID 999 Arman Maulana</h4>
+                <h5>Today (Thu, 15 Aug 2024)</h5>
+                <h5>DC 2 Karawang</h5>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Order Delivered Box Section End -->
+
+<!-- Order Items Section Start -->
+<section class="section-t-space-4">
+    <div class="custom-container">
+        <div class="title mb-10">
+            <h4 class="theme-color">Recorded time:</h4>
+        </div>
+
+        <ul class="order-items-list" id="attendance-container">
+            <!-- <li>
+                <div class="order-items-box">
+                    <div class="items-left-box">
+                        <a href="product.html" class="item-image">
+                            <img src="../assets/images/grocery/product/1.png" class="img-fluid" alt="">
+                        </a>
+                        <div class="item-name">
+                            <h5>Thu, 15 Aug 2024</h5>
+                            <h6>07:41</h6>
+                        </div>
+                    </div>
+
+                    <div class="items-right-box">
+                        <h5>Start Time</h5>
+                    </div>
+                </div>
+            </li>
+
+            <li>
+                <div class="order-items-box">
+                    <div class="items-left-box">
+                        <a href="product.html" class="item-image">
+                            <img src="../assets/images/grocery/product/1.png" class="img-fluid" alt="">
+                        </a>
+                        <div class="item-name">
+                            <h5>Thu, 15 Aug 2024</h5>
+                            <h6>07:41</h6>
+                        </div>
+                    </div>
+
+                    <div class="items-right-box">
+                        <h5>End Time</h5>
+                    </div>
+                </div>
+            </li> -->
+        </ul>
+    </div>
+</section>
+<!-- Order Items Section End -->
+
+
+
+
+
+
+
+<div class="mobile-style-6">
+    <ul style="justify-content: center">
+        <li>
+            <a href="javascript:void(0)" id="recordButton" class="mobile-box">
+                <i class="ri-fingerprint-2-line"></i>
+                <h6>Get Attendance</h6>
+            </a>
+        </li>
+    </ul>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="attendanceModalLabel">Capture Photo</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <video id="video" width="100%" autoplay></video>
+                <canvas id="canvas" style="display: none;"></canvas>
+                <img id="photo" style="display: none;" class="img-fluid" />
+            </div>
+            <div class="modal-footer">
+                <button id="captureButton" class="btn btn-secondary">Capture Photo</button>
+                <button id="retakeButton" class="btn btn-warning" style="display: none;">Retake Photo</button>
+                <button id="submitAttendance" class="btn btn-primary" style="display: none;">Kirim Kehadiran</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<script src="<%= baseUrl %>/qr_scanner/docs/jsQR.js"></script>
+<script>
+
+    $(document).ready(function () {
+
+        let video = document.getElementById('video');
+        let canvas = document.getElementById('canvas');
+        let photo = document.getElementById('photo');
+
+
+
+        var loadingMessage = document.getElementById("loadingMessage");
+        var outputContainer = document.getElementById("output");
+        var outputMessage = document.getElementById("outputMessage");
+        var outputData = document.getElementById("outputData");
+        var stream;
+        var currentFacingMode = 'user';
+        var map, marker, userLat, userLon, userAddress;
+        var latOffice = -6.1284492;
+        var lonOffice = 106.9358673;
+
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+            alert("Geolocation is not supported by this browser.");
+        }
+
+        function initializeMap(lat, lon) {
+            if (!map) {
+                // Initialize the map
+                map = L.map('map').setView([lat, lon], 13); // 13 is the zoom level
+
+                // Add the OpenStreetMap tiles
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+
+                // Add a marker to the map
+                marker = L.marker([lat, lon]).addTo(map);
+
+                var circle = L.circle([latOffice, lonOffice], {
+                    color: 'red',
+                    fillColor: '#F6E96B',
+                    fillOpacity: 0.5,
+                    radius: 3000
+                }).addTo(map);
+
+            } else {
+                map.setView([lat, lon], 13);
+                marker.setLatLng([lat, lon]);
+            }
+        }
+
+        function showPosition(position) {
+            var lat = position.coords.latitude;
+            var lon = position.coords.longitude;
+
+            initializeMap(lat, lon);
+
+            var geocodeURL = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`;
+
+            $.getJSON(geocodeURL, function (data) {
+                if (data && data.address) {
+                    var address = data.address;
+                    var city = address.city || address.town || address.village;
+                    var city_district = address.city_district;
+                    var country = address.country;
+                    var country_code = address.country_code;
+                    var industrial = address.industrial;
+                    var region = address.region;
+                    var postcode = address.postcode;
+                    var address_name = data.display_name;
+
+                    userAddress = data.display_name;
+                    userLon = data.lon;
+                    userLat = data.lat;
+
+                    $('#spanCountry').text(city_district + ', ' + country);
+                    $('#spanFullAddress').text(address_name);
+
+                    // Update marker popup with address
+                    marker.bindPopup(`<b>Your location :</b> ${data.display_name}`).openPopup();
+
+                    // Adjust the map view to center slightly above the marker position
+                    var offsetLat = lat - 0; // Adjust this value to move the map center
+                    map.setView([offsetLat, lon], 13);
+                    // sendLocationSPK(userLat, userLon, address_name);
+                } else {
+                    alert("Geocode was not successful for the following reason: " + data.error);
+                }
+            });
+        }
+
+        function showError(error) {
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    alert("Pengguna menolak permintaan Geolokasi.");
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    alert("Location information is unavailable.");
+                    break;
+                case error.TIMEOUT:
+                    alert("The request to get user location timed out.");
+                    break;
+                case error.UNKNOWN_ERROR:
+                    alert("An unknown error occurred.");
+                    break;
+            }
+        }
+
+        function drawLine(begin, end, color) {
+            canvas.beginPath();
+            canvas.moveTo(begin.x, begin.y);
+            canvas.lineTo(end.x, end.y);
+            canvas.lineWidth = 4;
+            canvas.strokeStyle = color;
+            canvas.stroke();
+        }
+
+        function startCamera() {
+            navigator.mediaDevices.getUserMedia({
+                video: {
+                    facingMode: "environment"
+                }
+            }).then(function (localStream) {
+                stream = localStream;
+                video.srcObject = stream;
+                video.setAttribute("playsinline", true); // required to tell iOS safari we don't want fullscreen
+                video.play();
+                requestAnimationFrame(tick);
+            }).catch(function (err) {
+                console.error("Error accessing camera: " + err);
+            });
+        }
+
+        function stopCamera() {
+            if (stream) {
+                let tracks = stream.getTracks();
+                tracks.forEach(function (track) {
+                    track.stop();
+                });
+            }
+        }
+
+        function tick() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                loadingMessage.hidden = true;
+                canvasElement.hidden = false;
+                outputContainer.hidden = false;
+
+                canvasElement.height = video.videoHeight;
+                canvasElement.width = video.videoWidth;
+                canvas.drawImage(video, 0, 0, canvasElement.width, canvasElement.height);
+                var imageData = canvas.getImageData(0, 0, canvasElement.width, canvasElement.height);
+                var code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+                if (code) {
+                    drawLine(code.location.topLeftCorner, code.location.topRightCorner, "#FF3B58");
+                    drawLine(code.location.topRightCorner, code.location.bottomRightCorner, "#FF3B58");
+                    drawLine(code.location.bottomRightCorner, code.location.bottomLeftCorner, "#FF3B58");
+                    drawLine(code.location.bottomLeftCorner, code.location.topLeftCorner, "#FF3B58");
+                    outputMessage.hidden = true;
+                    outputData.parentElement.hidden = false;
+                    outputData.innerText = code.data;
+
+                    getSPK(code.data);
+                    return;
+                } else {
+                    outputMessage.hidden = false;
+                    outputData.parentElement.hidden = true;
+                }
+            }
+            requestAnimationFrame(tick);
+        }
+
+        $('#qrScannerModal').on('show.bs.modal', function () {
+            startCamera();
+        });
+
+
+
+
+        $('#modalArrival').on('shown.bs.modal', function () {
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(function (mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = stream;
+                })
+                .catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
+        });
+
+        $('#modalArrival').on('hidden.bs.modal', function () {
+            if (stream) {
+                let tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                video.srcObject = null;
+            }
+        });
+
+        $('#modalTrackSPK').on('click', '.btnUpdateOrder', function () {
+            $('#modalTrackSPK').modal('hide');
+            $('#modalArrival').modal('show');
+        })
+
+        function startCameraKonfirmasi(facingMode) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: facingMode } })
+                .then(function (mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = stream;
+                })
+                .catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
+        }
+
+        $("#switchCamera").on("click", function () {
+            if (stream) {
+                let tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+            startCameraKonfirmasi(currentFacingMode);
+        });
+
+        var lastClickedButton;
+        $('#modal-conf').on('click', '.btnSubmit', function () {
+            lastClickedButton = $(this);
+        });
+
+        function sendLocationSPK(lat, lon, address) {
+            const urlParams = new URLSearchParams(window.location.search);
+            const spk = urlParams.get('spk');
+            let dataToPost = {
+                spk, lat, lon, address
+            }
+
+            if (spk) {
+                $.post("<%=baseUrl%>/guest/order/sendLocation", dataToPost, function (response) {
+
+                }, 'JSON');
+            } else {
+                console.log('tidak ada spk');
+            }
+        }
+
+        $('#getAttendance').on('click', function () {
+            console.log(userLat, userLon);
+            let locationLat = latOffice;
+            let locationLong = lonOffice;
+            var distance = getDistanceFromLatLonInMeter(userLat, userLon, locationLat, locationLong);
+            console.log(distance);
+        })
+
+        function getDistanceFromLatLonInMeter(lat1, lon1, lat2, lon2) {
+            var R = 6371; // Radius bumi dalam KM
+            var dLat = deg2rad(lat2 - lat1);
+            var dLon = deg2rad(lon2 - lon1);
+            var a =
+                Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            var distanceInKm = R * c; // Jarak dalam KM
+            var distanceInMeters = distanceInKm * 1000; // Konversi ke meter
+            return distanceInMeters;
+        }
+
+        function deg2rad(deg) {
+            return deg * (Math.PI / 180);
+        }
+
+
+        // Membuka modal dan mengaktifkan kamera
+        $('#recordButton').on('click', function () {
+            $('#attendanceModal').modal('show');
+
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(function (mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
+        });
+
+        // Menangkap gambar
+        $('#captureButton').on('click', function () {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            let data = canvas.toDataURL('image/png');
+            photo.setAttribute('src', data);
+            photo.style.display = 'block';
+            video.style.display = 'none';
+            $('#captureButton').hide();
+            $('#retakeButton').show();
+            $('#submitAttendance').show();
+            stream.getTracks().forEach(track => track.stop()); // Mematikan kamera
+        });
+
+        // Mengambil foto ulang
+        $('#retakeButton').on('click', function () {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                .then(function (mediaStream) {
+                    stream = mediaStream;
+                    video.srcObject = stream;
+                    video.play();
+                    video.style.display = 'block';
+                    photo.style.display = 'none';
+                    $('#retakeButton').hide();
+                    $('#submitAttendance').hide();
+                    $('#captureButton').show();
+                })
+                .catch(function (err) {
+                    console.log("An error occurred: " + err);
+                });
+        });
+
+        // Menutup modal
+        $('#attendanceModal').on('hidden.bs.modal', function () {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop()); // Memastikan kamera dimatikan
+            }
+            photo.style.display = 'none';
+            video.style.display = 'block';
+            $('#submitAttendance').hide();
+            $('#retakeButton').hide();
+            $('#captureButton').show();
+        });
+
+
+        // Mengirim data kehadiran
+        $('#submitAttendance').on('click', function () {
+            let imageData = canvas.toDataURL('image/png');
+            $.ajax({
+                url: '<%=baseUrl%>/attendance/submit-attendance',
+                data: {
+                    latitude: userLat,
+                    longitude: userLon,
+                    photo: imageData
+                },
+                type: 'POST',
+                dataType: 'json',
+                success: function (response) {
+                    alert('Kehadiran berhasil dikirim!');
+                    $('#attendanceModal').modal('hide');
+                    fetchAttendanceCards();
+                },
+                error: function (error) {
+                    alert('Gagal mengirim kehadiran.');
+                }
+            });
+        });
+
+
+        // Function to fetch and display attendance cards
+        function fetchAttendanceCards() {
+            $.ajax({
+                url: '<%=baseUrl%>/attendance/attendance-cards',
+                method: 'GET',
+                success: function (data) {
+                    const container = $('#attendance-container');
+                    container.empty();
+                    data.forEach(attendance => {
+                        const card = `
+                                <li>
+                                    <div class="order-items-box">
+                                        <div class="items-left-box">
+                                            <a href="product.html" class="item-image">
+                                                <img src="../${attendance.photo_path}" class="img-fluid" alt="">
+                                            </a>
+                                            <div class="item-name">
+                                                <h5>${formatDate(attendance.created_at)}</h5>
+                                                <h6>${formatTime(attendance.created_at)}</h6>
+                                            </div>
+                                        </div>
+
+                                        <div class="items-right-box">
+                                            <h5>End Time</h5>
+                                        </div>
+                                    </div>
+                                </li>
+                            `;
+                        container.append(card);
+                    });
+                },
+                error: function (err) {
+                    alert('Error fetching attendance cards: ' + err.statusText);
+                }
+            });
+        }
+
+        // Initial fetch of attendance cards
+        fetchAttendanceCards();
+
+        // Fungsi untuk mendapatkan tanggal dalam format "Thu, 15 Aug 2024"
+        function formatDate(isoDate) {
+            const date = new Date(isoDate);
+            return date.toLocaleDateString('en-GB', {
+                weekday: 'short', // Short weekday name
+                day: '2-digit', // Two-digit day
+                month: 'short', // Short month name
+                year: 'numeric' // Full year
+            });
+        }
+
+        // Fungsi untuk mendapatkan waktu dalam format "07:40"
+        function formatTime(isoDate) {
+            const date = new Date(isoDate);
+            return date.toLocaleTimeString('en-GB', {
+                hour: '2-digit', // Two-digit hour
+                minute: '2-digit' // Two-digit minute
+            });
+        }
+
+    });
+</script>
