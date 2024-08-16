@@ -201,6 +201,28 @@
             setTimeout(stopLoading, 3000);
         }
 
+
+        function formatDate(date) {
+            // Nama hari dalam seminggu
+            const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            // Nama bulan
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+            // Ambil hari, bulan, dan tahun
+            const dayName = days[date.getDay()];
+            const day = date.getDate();
+            const month = months[date.getMonth()];
+            const year = date.getFullYear();
+
+            // Formatkan string tanggal
+            return `Today (${dayName}, ${day} ${month} ${year})`;
+        }
+
+        // Ambil tanggal saat ini
+        const today = new Date();
+        console.log(formatDate(today)); // Output: Today (Thu, 15 Aug 2024)
+
         // loadingMenu();
     </script>
 
@@ -299,9 +321,9 @@
 
             <%if(user.username=='Guest' ){%>
                 <a href="<%=baseUrl%>/auth/login" class="sidebar-btn grocery-btn white-btn">Login</a>
-            <%}else{%>
-                <a href="<%=baseUrl%>/auth/logout" class="sidebar-btn grocery-btn white-btn">Logout</a>
-            <%}%>
+                <%}else{%>
+                    <a href="<%=baseUrl%>/auth/logout" class="sidebar-btn grocery-btn white-btn">Logout</a>
+                    <%}%>
         </div>
     </div>
     <!-- Side Menu Offcanvas End -->

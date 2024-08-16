@@ -6,15 +6,18 @@ const baseUrl = config.baseUrl;
 
 const authenticateJWT = (req, res, next) => {
   const token = req.cookies.token;
+  res.cookie('originalUrl', req.originalUrl, { httpOnly: true });
   if (token) {
     jwt.verify(token, config.jwtSecret, (err, user) => {
       if (err) {
         return res.redirect(baseUrl + '/auth/login');
       }
       req.user = user;
+      res.user = user;
       next();
     });
   } else {
+
     res.redirect(baseUrl + '/auth/login');
   }
 };

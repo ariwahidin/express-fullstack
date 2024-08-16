@@ -18,8 +18,11 @@
     <div class="custom-container mt-3">
         <div class="order-delivered-box">
             <div class="order-content">
-                <h4>PY-ID 999 Arman Maulana</h4>
-                <h5>Today (Thu, 15 Aug 2024)</h5>
+                <h4>
+                    <%= user.username.toUpperCase() %>
+                </h4>
+                <h5 id="today">
+                </h5>
                 <h5>DC 2 Karawang</h5>
             </div>
         </div>
@@ -148,6 +151,17 @@
         } else {
             alert("Geolocation is not supported by this browser.");
         }
+
+        $('#today').text(formatDate(today));
+
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+
+        const user = getCookie('token');
+        console.log(user)
 
         function initializeMap(lat, lon) {
             if (!map) {

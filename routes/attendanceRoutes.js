@@ -3,6 +3,7 @@ const router = express.Router();
 const { optionalAuthenticateToken } = require('../middleware/authenticateJWT');
 const attendanceController = require('../controllers/attendanceController');
 const multer = require('multer');
+const auth = require('../middleware/authenticateJWT');
 const path = require('path');
 
 const storage = multer.diskStorage({
@@ -22,7 +23,7 @@ router.post('/order/status', optionalAuthenticateToken, attendanceController.get
 router.post('/order/save', optionalAuthenticateToken, upload.single('imageData'), attendanceController.saveOrderStatus);
 router.post('/getOrder', attendanceController.getOrderBySPK);
 router.post('/order/sendLocation', attendanceController.sendLocation);
-router.get('/get', attendanceController.getAttendance);
+router.get('/get', auth.authenticateJWT, attendanceController.getAttendance);
 router.post('/submit-attendance', attendanceController.submitAttendance);
 router.get('/attendance-cards', attendanceController.getAttendanceCards);
 

@@ -8,6 +8,9 @@ const attendanceModel = require('../models/attendanceModel');
 
 
 exports.getAttendance = async (req, res) => {
+
+    console.log(req.user);
+
     const user = req.user ? req.user : req.user = { username: 'Guest' };
     if (req.query.spk) {
         try {
@@ -29,14 +32,13 @@ exports.getAttendance = async (req, res) => {
             WHERE a.order_id = ?
             GROUP BY a.ship_to`;
             const [result] = await db.execute(sql, [spk]);
-            console.log(result);
-            return renderWithLayout(res, 'attendance/index', { user, title: 'Record Attendance', order: result });
+            return renderWithLayout(res, 'attendance/index', {user, title: 'Record Attendance', order: result });
         } catch (err) {
             console.error(err);
             return res.status(500).send('Internal Server Error');
         }
     } else {
-        return renderWithLayout(res, 'attendance/index', { user, title: 'Record Attendance', order: [] });
+        return renderWithLayout(res, 'attendance/index', {user, title: 'Record Attendance', order: [] });
     }
 
 };
