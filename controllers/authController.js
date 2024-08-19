@@ -7,14 +7,21 @@ exports.login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const [rows] = await db.execute('SELECT * FROM users_master WHERE username = ? AND password = ?', [username, password]);
+        const [rows] = await db.execute(`SELECT a.id, a.username, b.placement_id, c.lat, c.lon, c.name as placement_name
+        FROM users_master a
+        INNER JOIN employee b ON a.id = b.user_id
+        INNER JOIN placement_master c ON b.placement_id = c.id
+        WHERE a.username = ? AND a.password = ?`, [username, password]);
 
         if (rows.length > 0) {
             const user = rows[0];
-            const token = jwt.sign({ id: user.id, username: user.username }, config.jwtSecret, { expiresIn: '1h' });
+
+            console.log(user);
+
+            const token = jwt.sign(user, config.jwtSecret, { expiresIn: '300s' });
+            const refreshToken = jwt.sign(user, config.jwtRefreshSecret, { expiresIn: '7d' });
             res.cookie('token', token, { httpOnly: true });
-            
-            console.log(req.cookies.originalUrl);
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
 
             let defaultUrl = baseUrl + '/dashboard';
 

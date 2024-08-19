@@ -19,13 +19,13 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get('/order', optionalAuthenticateToken, attendanceController.getAttendance);
-router.post('/order/status', optionalAuthenticateToken, attendanceController.getOrderStatus);
+router.post('/order/status', optionalAuthenticateToken,attendanceController.getOrderStatus);
 router.post('/order/save', optionalAuthenticateToken, upload.single('imageData'), attendanceController.saveOrderStatus);
 router.post('/getOrder', attendanceController.getOrderBySPK);
 router.post('/order/sendLocation', attendanceController.sendLocation);
 router.get('/get', auth.authenticateJWT, attendanceController.getAttendance);
-router.post('/submit-attendance', attendanceController.submitAttendance);
-router.get('/attendance-cards', attendanceController.getAttendanceCards);
+router.post('/submit-attendance', auth.authenticateJWT, attendanceController.submitAttendance);
+router.get('/attendance-cards', auth.authenticateJWT, attendanceController.getAttendanceCards);
 
 router.get('/testSocket', (req, res) => {
     req.io.emit('updateArmadas');

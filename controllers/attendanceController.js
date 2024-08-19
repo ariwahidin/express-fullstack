@@ -9,9 +9,8 @@ const attendanceModel = require('../models/attendanceModel');
 
 exports.getAttendance = async (req, res) => {
 
-    console.log(req.user);
-
     const user = req.user ? req.user : req.user = { username: 'Guest' };
+
     if (req.query.spk) {
         try {
             const spk = req.query.spk;
@@ -32,27 +31,28 @@ exports.getAttendance = async (req, res) => {
             WHERE a.order_id = ?
             GROUP BY a.ship_to`;
             const [result] = await db.execute(sql, [spk]);
-            return renderWithLayout(res, 'attendance/index', {user, title: 'Record Attendance', order: result });
+            return renderWithLayout(res, 'attendance/index', { user, title: 'Record Attendance', order: result });
         } catch (err) {
             console.error(err);
             return res.status(500).send('Internal Server Error');
         }
     } else {
-        return renderWithLayout(res, 'attendance/index', {user, title: 'Record Attendance', order: [] });
+        return renderWithLayout(res, 'attendance/index', { user, title: 'Record Attendance', order: [] });
     }
 
 };
 
 
-exports.submitAttendance = (req, res) => {
+exports.submitAttendance = async (req, res) => {
     const { latitude, longitude, photo } = req.body;
-
-    // console.log('essss');
-    // console.log(req.body);
+    let user_id = req.user.id;
 
     // Decode base64 photo
     const base64Data = photo.replace(/^data:image\/png;base64,/, "");
     const photoPath = `images/${Date.now()}.png`;
+
+    const dateNow = moment.tz('Asia/Jakarta').format('YYYY-MM-DD');
+    let status = 'in';
 
     // Save photo to server
     fs.writeFile(path.join(__dirname, '..', 'public', photoPath), base64Data, 'base64', async (err) => {
@@ -60,12 +60,15 @@ exports.submitAttendance = (req, res) => {
             return res.status(500).json({ error: 'Failed to save photo.' });
         }
 
-        // Save attendance to database
         try {
-            await attendanceModel.saveAttendance(latitude, longitude, photoPath);
+            const rows = await attendanceModel.cekAttendance(user_id, dateNow);
+            if (rows.length > 0) {
+                status = 'out';
+            }
+            await attendanceModel.saveAttendance({ user_id, latitude, longitude, photoPath, status });
             res.json({ success: true, message: 'Attendance recorded successfully.' });
         } catch (err) {
-            res.status(500).json({ error: 'Failed to save attendance.' });
+            res.status(500).json({ error: 'Failed to retrieve attendance list.' });
         }
     });
 };
@@ -73,8 +76,10 @@ exports.submitAttendance = (req, res) => {
 
 // Fungsi baru untuk mendapatkan semua data absensi
 exports.getAttendanceCards = async (req, res) => {
+    let user_id = req.user.id;
+    let today = moment.tz('Asia/Jakarta').format('YYYY-MM-DD');
     try {
-        const rows = await attendanceModel.getAllAttendances();
+        const rows = await attendanceModel.myAttendanceToday(user_id, today);
         res.json(rows); // Mengirim data sebagai JSON
     } catch (err) {
         res.status(500).json({ error: 'Failed to retrieve attendance list.' });

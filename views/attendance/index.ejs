@@ -23,7 +23,10 @@
                 </h4>
                 <h5 id="today">
                 </h5>
-                <h5>DC 2 Karawang</h5>
+                <h5>
+                    <i class="ri-community-fill"></i>
+                    <%= user.placement_name %>
+                </h5>
             </div>
         </div>
     </div>
@@ -37,58 +40,40 @@
             <h4 class="theme-color">Recorded time:</h4>
         </div>
 
-        <ul class="order-items-list" id="attendance-container">
-            <!-- <li>
-                <div class="order-items-box">
-                    <div class="items-left-box">
-                        <a href="product.html" class="item-image">
-                            <img src="../assets/images/grocery/product/1.png" class="img-fluid" alt="">
-                        </a>
-                        <div class="item-name">
-                            <h5>Thu, 15 Aug 2024</h5>
-                            <h6>07:41</h6>
+        <div style="max-height: 200px; overflow: auto">
+            <ul class="order-items-list" id="attendance-container">
+                <!-- <li>
+                    <div class="order-items-box">
+                        <div class="items-left-box">
+                            <a href="product.html" class="item-image">
+                                <img src="../assets/images/grocery/product/1.png" class="img-fluid" alt="">
+                            </a>
+                            <div class="item-name">
+                                <h5>Thu, 15 Aug 2024</h5>
+                                <h6>07:41</h6>
+                            </div>
+                        </div>
+    
+                        <div class="items-right-box">
+                            <h5>Start Time</h5>
                         </div>
                     </div>
+                </li> -->
+            </ul>
+        </div>
 
-                    <div class="items-right-box">
-                        <h5>Start Time</h5>
-                    </div>
-                </div>
-            </li>
-
-            <li>
-                <div class="order-items-box">
-                    <div class="items-left-box">
-                        <a href="product.html" class="item-image">
-                            <img src="../assets/images/grocery/product/1.png" class="img-fluid" alt="">
-                        </a>
-                        <div class="item-name">
-                            <h5>Thu, 15 Aug 2024</h5>
-                            <h6>07:41</h6>
-                        </div>
-                    </div>
-
-                    <div class="items-right-box">
-                        <h5>End Time</h5>
-                    </div>
-                </div>
-            </li> -->
-        </ul>
     </div>
 </section>
 <!-- Order Items Section End -->
-
-
-
-
-
 
 
 <div class="mobile-style-6">
     <ul style="justify-content: center">
         <li>
             <a href="javascript:void(0)" id="recordButton" class="mobile-box">
-                <i class="ri-fingerprint-2-line"></i>
+                <span id="recordIcon">
+                    <i class="ri-fingerprint-2-line"></i>
+                </span>
                 <h6>Get Attendance</h6>
             </a>
         </li>
@@ -134,8 +119,6 @@
         let canvas = document.getElementById('canvas');
         let photo = document.getElementById('photo');
 
-
-
         var loadingMessage = document.getElementById("loadingMessage");
         var outputContainer = document.getElementById("output");
         var outputMessage = document.getElementById("outputMessage");
@@ -143,8 +126,26 @@
         var stream;
         var currentFacingMode = 'user';
         var map, marker, userLat, userLon, userAddress;
-        var latOffice = -6.1284492;
-        var lonOffice = 106.9358673;
+        var latOffice = `<%= user.lat %>`;
+        var lonOffice = `<%= user.lon %>`;
+
+
+
+        let attendanceOut = false;
+        let attendanceIn = false;
+
+        changeButtonRecord();
+        function changeButtonRecord() {
+            if (attendanceOut) {
+                $('#recordButton').hide()
+            } else {
+                if (attendanceOut == false && attendanceIn == false) {
+                    $('#recordIcon').html(`<i class="ri-login-box-fill"></i>`);
+                } else {
+                    $('#recordIcon').html(`<i class="ri-logout-box-fill"></i>`);
+                }
+            }
+        }
 
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(showPosition, showError);
@@ -161,7 +162,6 @@
         }
 
         const user = getCookie('token');
-        console.log(user)
 
         function initializeMap(lat, lon) {
             if (!map) {
@@ -317,8 +317,6 @@
         });
 
 
-
-
         $('#modalArrival').on('shown.bs.modal', function () {
             navigator.mediaDevices.getUserMedia({ video: true })
                 .then(function (mediaStream) {
@@ -385,11 +383,9 @@
         }
 
         $('#getAttendance').on('click', function () {
-            console.log(userLat, userLon);
             let locationLat = latOffice;
             let locationLong = lonOffice;
             var distance = getDistanceFromLatLonInMeter(userLat, userLon, locationLat, locationLong);
-            console.log(distance);
         })
 
         function getDistanceFromLatLonInMeter(lat1, lon1, lat2, lon2) {
@@ -409,7 +405,6 @@
         function deg2rad(deg) {
             return deg * (Math.PI / 180);
         }
-
 
         // Membuka modal dan mengaktifkan kamera
         $('#recordButton').on('click', function () {
@@ -473,9 +468,21 @@
 
 
         // Mengirim data kehadiran
-        $('#submitAttendance').on('click', function () {
+        $('#submitAttendance').on('click', async function () {
+
+
+
+            var distance = await getDistanceFromLatLonInMeter(userLat, userLon, latOffice, lonOffice);
+
+            if (distance > 3000) {
+                alert('Out of range!');
+                return;
+            }
+
             let imageData = canvas.toDataURL('image/png');
-            $.ajax({
+
+            startLoading();
+            await $.ajax({
                 url: '<%=baseUrl%>/attendance/submit-attendance',
                 data: {
                     latitude: userLat,
@@ -485,9 +492,18 @@
                 type: 'POST',
                 dataType: 'json',
                 success: function (response) {
-                    alert('Kehadiran berhasil dikirim!');
-                    $('#attendanceModal').modal('hide');
-                    fetchAttendanceCards();
+                    stopLoading();
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        title: "Attendence has been sent!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    }).then(() => {
+                        $('#attendanceModal').modal('hide');
+                        attendanceIn = true;
+                        fetchAttendanceCards();
+                    });
                 },
                 error: function (error) {
                     alert('Gagal mengirim kehadiran.');
@@ -505,6 +521,9 @@
                     const container = $('#attendance-container');
                     container.empty();
                     data.forEach(attendance => {
+                        if (attendance.status == 'out') {
+                            attendanceOut = true;
+                        }
                         const card = `
                                 <li>
                                     <div class="order-items-box">
@@ -513,19 +532,21 @@
                                                 <img src="../${attendance.photo_path}" class="img-fluid" alt="">
                                             </a>
                                             <div class="item-name">
-                                                <h5>${formatDate(attendance.created_at)}</h5>
-                                                <h6>${formatTime(attendance.created_at)}</h6>
+                                                <h5>${formatDate(attendance.time)}</h5>
+                                                <h6>${formatTime(attendance.time)}</h6>
                                             </div>
                                         </div>
 
                                         <div class="items-right-box">
-                                            <h5>End Time</h5>
+                                            <h5>${attendance.status.toUpperCase()}</h5>
                                         </div>
                                     </div>
                                 </li>
                             `;
                         container.append(card);
                     });
+
+                    changeButtonRecord();
                 },
                 error: function (err) {
                     alert('Error fetching attendance cards: ' + err.statusText);
