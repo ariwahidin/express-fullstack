@@ -10,40 +10,22 @@ const attendanceModel = require('../models/attendanceModel');
 exports.getAttendance = async (req, res) => {
 
     const user = req.user ? req.user : req.user = { username: 'Guest' };
+    const schedule = await attendanceModel.getMySchedule(req.user.employee_id);
 
-    if (req.query.spk) {
-        try {
-            const spk = req.query.spk;
-            const sql = `SELECT DISTINCT a.order_id, a.delivery_no, a.ship_to, a.destination_city, 
-            b.cust_name, b.cust_addr1,
-            (SELECT order_status FROM order_d_status 
-            WHERE order_id = a.order_id 
-            AND ship_to = a.ship_to
-            AND order_status = 'truck_arrival'
-            ) AS arrival_status,
-            (SELECT order_status FROM order_d_status 
-            WHERE order_id = a.order_id 
-            AND ship_to = a.ship_to
-            AND order_status = 'truck_unloading'
-            ) AS unloading_status
-            FROM order_d a
-            INNER JOIN customer b ON a.ship_to = b.cust_id
-            WHERE a.order_id = ?
-            GROUP BY a.ship_to`;
-            const [result] = await db.execute(sql, [spk]);
-            return renderWithLayout(res, 'attendance/index', { user, title: 'Record Attendance', order: result });
-        } catch (err) {
-            console.error(err);
-            return res.status(500).send('Internal Server Error');
-        }
-    } else {
-        return renderWithLayout(res, 'attendance/index', { user, title: 'Record Attendance', order: [] });
+    try {
+        await renderWithLayout(res, 'attendance/index', { user, title: 'Record Attendance', schedule: schedule[0] });
+    } catch (error) {
+        console.log(error);
+        throw error;
     }
-
 };
 
 
 exports.submitAttendance = async (req, res) => {
+
+    const currentDate = moment().tz("Asia/Jakarta").format("YYYY-MM-DD");
+    const currentTime = moment().tz("Asia/Jakarta").format("HH:mm:ss");
+
     const { latitude, longitude, photo } = req.body;
     let user_id = req.user.id;
 
@@ -61,13 +43,66 @@ exports.submitAttendance = async (req, res) => {
         }
 
         try {
-            const rows = await attendanceModel.cekAttendance(user_id, dateNow);
+            const rows = await attendanceModel.cekAttendanceIn(req.user.employee_id);
             if (rows.length > 0) {
                 status = 'out';
             }
-            await attendanceModel.saveAttendance({ user_id, latitude, longitude, photoPath, status });
+
+            let shiftId = await attendanceModel.getShiftId(req.user.employee_id);
+
+
+
+
+            // Dapatkan shift_end_time dari tabel employee_shifts
+            const [shift] = await db.execute(
+                `SELECT b.start_time, b.end_time FROM employee_schedules a
+                INNER JOIN shifts b ON a.shift_id = b.id
+                WHERE a.employee_id = ? AND schedule_date = DATE(NOW()) LIMIT 1`,
+                [req.user.employee_id]
+            );
+
+            if (shift.length === 0) {
+                return res.status(400).json({ message: "No shift scheduled for today." });
+            }
+
+
+            if (status === 'in') {
+                await attendanceModel.clockIn({ employee_id: req.user.employee_id, latitude, longitude, photoPath, status, shiftId: await shiftId[0].shift_id, shift_start_time: shift[0].start_time, shift_end_time: shift[0].end_time });
+            } else {
+
+                const [rows] = await db.execute(
+                    'SELECT * FROM employee_attendance WHERE employee_id = ? AND date = ? AND clock_in IS NOT NULL',
+                    [req.user.employee_id, currentDate]
+                );
+
+                if (rows.length === 0) {
+                    return res.status(400).json({ message: "You have not clocked in yet." });
+                }
+
+                const attendance = rows[0];
+
+                await attendanceModel.clockOut({ employee_id: req.user.employee_id, latitude, longitude, photoPath, status, shiftId: await shiftId[0].shift_id });
+
+
+                // Cek apakah overtime terjadi (melebihi jam kerja shift)
+                const shiftEndTime = moment(attendance.shift_end_time, "HH:mm:ss");
+                const clockOutTime = moment(currentTime, "HH:mm:ss");
+
+
+                if (clockOutTime.isAfter(shiftEndTime)) {
+                    const overtimeDuration = clockOutTime.diff(shiftEndTime, 'minutes');
+        
+                    // Insert ke table employee_overtime jika overtime terjadi
+                    await db.execute(
+                        'INSERT INTO employee_overtime (attendance_id, employee_id, overtime_start, overtime_end, duration_minutes, status) VALUES (?, ?, ?, ?, ?, ?)',
+                        [attendance.id, req.user.employee_id, shiftEndTime.format("HH:mm:ss"), clockOutTime.format("HH:mm:ss"), overtimeDuration, 'pending']
+                    );
+                }
+            }
+
             res.json({ success: true, message: 'Attendance recorded successfully.' });
         } catch (err) {
+            console.error(err);
             res.status(500).json({ error: 'Failed to retrieve attendance list.' });
         }
     });
@@ -79,10 +114,39 @@ exports.getAttendanceCards = async (req, res) => {
     let user_id = req.user.id;
     let today = moment.tz('Asia/Jakarta').format('YYYY-MM-DD');
     try {
-        const rows = await attendanceModel.myAttendanceToday(user_id, today);
+        const rows = await attendanceModel.getMyAttendance(req.user.employee_id);
         res.json(rows); // Mengirim data sebagai JSON
     } catch (err) {
         res.status(500).json({ error: 'Failed to retrieve attendance list.' });
+    }
+};
+
+exports.clockIn = async (req, res) => {
+    const employeeId = req.body.employeeId;
+    const currentDate = moment().tz("Asia/Jakarta").format("YYYY-MM-DD");
+    const currentTime = moment().tz("Asia/Jakarta").format("HH:mm:ss");
+
+    try {
+        // Check if employee has already clocked in today
+        const [rows] = await db.execute(
+            'SELECT * FROM attendance WHERE employee_id = ? AND date = ?',
+            [employeeId, currentDate]
+        );
+
+        if (rows.length > 0) {
+            return res.status(400).json({ message: "You have already clocked in today." });
+        }
+
+        // Insert clock_in time
+        await db.execute(
+            'INSERT INTO employee_attendance (employee_id, date, clock_in, shift_id) VALUES (?, ?, ?, ?)',
+            [employeeId, currentDate, currentTime, req.body.shiftId]
+        );
+
+        res.status(200).json({ message: "Clock In successful." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "An error occurred during Clock In." });
     }
 };
 

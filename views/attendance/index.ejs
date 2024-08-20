@@ -16,16 +16,16 @@
 <!-- Order Delivered Box Section Start -->
 <section>
     <div class="custom-container mt-3">
-        <div class="order-delivered-box">
+        <div class="order-delivered-box bg-primary"">
             <div class="order-content">
                 <h4>
-                    <%= user.username.toUpperCase() %>
+                    <%= user.fullname %>, 
                 </h4>
                 <h5 id="today">
                 </h5>
                 <h5>
-                    <i class="ri-community-fill"></i>
-                    <%= user.placement_name %>
+                    <span style="font-size: small;"> Shift : <%= schedule.shift_name %></span>
+                    <span style="font-size: small;"> [ <%= schedule.start_time %> - <%= schedule.end_time %> ]</span>
                 </h5>
             </div>
         </div>
@@ -67,7 +67,7 @@
 <!-- Order Items Section End -->
 
 
-<div class="mobile-style-6">
+<div class="mobile-style-6 bg-primary">
     <ul style="justify-content: center">
         <li>
             <a href="javascript:void(0)" id="recordButton" class="mobile-box">
@@ -532,8 +532,8 @@
                                                 <img src="../${attendance.photo_path}" class="img-fluid" alt="">
                                             </a>
                                             <div class="item-name">
-                                                <h5>${formatDate(attendance.time)}</h5>
-                                                <h6>${formatTime(attendance.time)}</h6>
+                                                <h5>${formatDate(attendance.date)}</h5>
+                                                <h6>${attendance.time}</h6>
                                             </div>
                                         </div>
 

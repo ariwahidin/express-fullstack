@@ -7,9 +7,11 @@ exports.login = async (req, res) => {
     const { username, password } = req.body;
 
     try {
-        const [rows] = await db.execute(`SELECT a.id, a.username, b.placement_id, c.lat, c.lon, c.name as placement_name
+        const [rows] = await db.execute(`SELECT a.id, a.username, b.placement_id, 
+        b.fullname, b.email, a.employee_id,
+        c.lat, c.lon, c.name as placement_name
         FROM users_master a
-        INNER JOIN employee b ON a.id = b.user_id
+        INNER JOIN employee b ON a.employee_id = b.id
         INNER JOIN placement_master c ON b.placement_id = c.id
         WHERE a.username = ? AND a.password = ?`, [username, password]);
 

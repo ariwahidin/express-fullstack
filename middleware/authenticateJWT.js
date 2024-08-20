@@ -12,7 +12,7 @@ const authenticateJWT = (req, res, next) => {
   if (token) {
     jwt.verify(token, config.jwtSecret, (err, user) => {
 
-      console.log(user);
+      // console.log(user);
 
       if (err && err.name === 'TokenExpiredError') {
         if (refreshToken) {
@@ -27,6 +27,9 @@ const authenticateJWT = (req, res, next) => {
               {
                 id: user.id, 
                 username: user.username,
+                fullname: user.fullname,
+                email: user.email,
+                employee_id: user.employee_id,
                 placement_id: user.placement_id, 
                 lat: user.lat, 
                 lon: user.lon,
