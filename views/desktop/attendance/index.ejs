@@ -1,0 +1,101 @@
+<section>
+    <div class="row">
+        <div class="col-md-12">
+            <div style="margin-top: -10px !important;" class="pb-3">
+                <a href="javascript:void(0)" id="btnAttendance"
+                    class="btn btn-primary waves-effect waves-light">Attendance</a>
+                <a href="javascript:void(0)" id="btnOvertime"
+                    class="btn btn-primary waves-effect waves-light">Overtime</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card" id="cardAttendance">
+                <h5 class="card-header">Employee Attendence</h5>
+                <div class="table-responsive text-nowrap" id="attDiv">
+                </div>
+            </div>
+            <div style="display: none;" class="card" id="cardOvertime">
+                <h5 class="card-header">Employee Overtime</h5>
+                <div class="table-responsive text-nowrap" id="ovrDiv">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script>
+    $(document).ready(function () {
+        getAttencance();
+        getOvertime();
+
+
+        function getAttencance() {
+            $.ajax({
+                type: "GET",
+                url: `<%= baseUrl %>/desktop/attendance/get`,
+                success: function (response) {
+                    $('#attDiv').html(response.table);
+                }
+            });
+        }
+
+        function getOvertime() {
+            $.ajax({
+                type: "GET",
+                url: `<%= baseUrl %>/desktop/attendance/get/overtime`,
+                success: function (response) {
+                    // console.log(response)
+                    $('#ovrDiv').html(response.table);
+                }
+            });
+        }
+
+        $('#cardOvertime').hide();
+        $('#btnOvertime').on('click', function () {
+            $('#cardAttendance').hide();
+            $('#cardOvertime').show();
+        });
+
+        $('#btnAttendance').on('click', function () {
+            $('#cardAttendance').show();
+            $('#cardOvertime').hide();
+        });
+
+
+        $('#ovrDiv').on('click', '.approve-btn', function () {
+            const overtimeId = $(this).data('id');
+            approveOrRejectOvertime(overtimeId, 'approved');
+        });
+
+        $('#ovrDiv').on('click', '.reject-btn', function () {
+            const overtimeId = $(this).data('id');
+            approveOrRejectOvertime(overtimeId, 'rejected');
+        });
+
+        function approveOrRejectOvertime(overtimeId, status) {
+            startLoading();
+            $.ajax({
+                url: `<%= baseUrl %>/desktop/attendance/overtime/approveOrReject`,
+                type: 'POST',
+                data: {
+                    overtimeId: overtimeId,
+                    status: status
+                },
+                success: function (response) {
+                    alert(response.message);
+                    getOvertime();
+                    stopLoading();
+                },
+                error: function (xhr) {
+                    alert('Error: ' + xhr.responseJSON.message);
+                }
+            });
+        }
+
+    })
+</script>

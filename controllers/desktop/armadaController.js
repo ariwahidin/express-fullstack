@@ -1,9 +1,11 @@
 const viewDesktop = require('../../helpers/viewDesktop');
+const renderView = require('../../helpers/renderView');
 const moment = require('moment-timezone');
 const db = require('../../database');
 
 exports.index = (req, res) => {
-    return viewDesktop(res, 'armada', { title: 'Dashboard', user: req.user });
+    // return viewDesktop(res, 'armada', { title: 'Dashboard', user: req.user });
+    return renderView(res, 'desktop/armada', { title: 'Dashboard', user: req.user });
 };
 
 exports.getStatusArmada = async (req, res) => {

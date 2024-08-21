@@ -1,0 +1,55 @@
+<table class="table table-sm">
+    <thead class="table-light">
+        <tr>
+            <th>No.</th>
+            <th>Fullname</th>
+            <th>Date</th>
+            <th>Start Overtime</th>
+            <th>End Overtime</th>
+            <th>Duration Minutes</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+    <tbody class="table-border-bottom-0">
+        <% attendanceData.forEach(function(attendance, index) { %>
+            <tr>
+                <td>
+                    <%= index+1 %>
+                </td>
+                <td>
+                    <%= attendance.fullname %>
+                </td>
+                <td>
+                    <%= attendance.date.toLocaleDateString() %>
+                </td>
+                <td>
+                    <%= attendance.overtime_start %>
+                </td>
+                <td>
+                    <%= attendance.overtime_end %>
+                </td>
+                <td>
+                    <%= attendance.duration_minutes %>
+                </td>
+                <td>
+                    <%= attendance.status %>
+                </td>
+                <td>
+                    <div class="dropdown">
+                        <button type="button" class="btn p-0 dropdown-toggle hide-arrow" data-bs-toggle="dropdown"><i
+                                class="ti ti-dots-vertical"></i></button>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="javascript:void(0);">
+                                Edit</a>
+                            <a class="dropdown-item approve-btn" href="javascript:void(0);" data-id="<%= attendance.id %>">
+                                Approve</a>
+                            <a class="dropdown-item reject-btn" href="javascript:void(0);" data-id="<%= attendance.id %>">
+                                Reject</a>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <% }); %>
+    </tbody>
+</table>
