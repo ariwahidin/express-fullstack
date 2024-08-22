@@ -7,16 +7,17 @@ const attendanceController = require('../controllers/desktop/attendanceControlle
 // const authController = require('../controllers/api/asics/authController');
 // const orderController = require('../controllers/api/asics/orderController');
 
-router.get('/', homeController.index);
-router.get('/home', homeController.home);
-router.get('/armada', armadaController.index);
+router.get('/', auth.authenticateJWT, homeController.index);
+router.get('/home', auth.authenticateJWT, homeController.home);
+router.get('/armada', auth.authenticateJWT, armadaController.index);
 router.post('/armada/getStatusArmada', armadaController.getOrdersWithDetail);
 router.get('/armada/getOrder', armadaController.getOrdersWithDetail)
 
 
 // Attendance
-router.get('/attendance/index',auth.authenticateJWT, attendanceController.index);
+router.get('/attendance/index', auth.authenticateJWT, attendanceController.index);
 router.get('/attendance/get', auth.authenticateJWT, attendanceController.getAttendance);
+router.get('/attendance/employee', auth.authenticateJWT, attendanceController.employee);
 router.get('/attendance/get/overtime', auth.authenticateJWT, attendanceController.getOvertime);
 router.post('/attendance/overtime/approveOrReject', auth.authenticateJWT, attendanceController.approveOrRejectOvertime);
 

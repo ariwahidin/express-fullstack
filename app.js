@@ -9,6 +9,8 @@ const locationRoutes = require('./routes/locationRoutes');
 const guestController = require('./routes/guestRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
 const desktopRoutes = require('./routes/desktopRoutes');
+const logRequestInfo = require('./middleware/logInfo'); // Import middleware
+const logger = require('./utils/logger'); // Import logger
 
 const app = express();
 
@@ -38,6 +40,7 @@ app.locals.baseUrl = baseUrl; // agar bisa di akses di view
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ limit: '50mb', extended: true }));
 app.use(cookieParser());
+app.use(logRequestInfo); // Gunakan middleware untuk logging
 
 // app.use(express.static(path.join(__dirname, 'public')));
 

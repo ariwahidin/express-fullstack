@@ -94,3 +94,7 @@ exports.approveOrRejectOvertime = async (req, res) => {
         res.status(500).json({ message: "An error occurred during overtime approval." });
     }
 };
+
+exports.employee = (req, res) => {
+    return renderView(res, 'desktop/attendance/employee', { user: req.user });
+};
