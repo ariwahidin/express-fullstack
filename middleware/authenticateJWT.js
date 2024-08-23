@@ -53,7 +53,13 @@ const authenticateJWT = (req, res, next) => {
                 lon: user.lon,
                 placement_name: user.placement_name
               }, config.jwtSecret, { expiresIn: '300s' });
-            res.cookie('token', newAccessToken, { httpOnly: true });
+            // res.cookie('token', newAccessToken, { httpOnly: true });
+
+            res.cookie('token', newAccessToken, {
+              httpOnly: true,
+              maxAge: 300 * 1000 // 5 minutes in milliseconds
+            });
+
 
             req.user = user;
             return next();
