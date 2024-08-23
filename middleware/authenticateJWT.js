@@ -57,7 +57,8 @@ const authenticateJWT = (req, res, next) => {
 
             res.cookie('token', newAccessToken, {
               httpOnly: true,
-              maxAge: 300 * 1000 // 5 minutes in milliseconds
+              secure: true,
+              maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days in milliseconds
             });
 
 
