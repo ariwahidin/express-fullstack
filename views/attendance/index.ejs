@@ -17,18 +17,19 @@
 <section>
     <div class="custom-container mt-3">
         <div class="order-delivered-box bg-primary"">
-            <div class="order-content">
-                <h4>
-                    <%= user.fullname %>, 
-                </h4>
-                <h5 id="today">
-                </h5>
-                <h5>
-                    <span style="font-size: small;"> Shift : <%= schedule.shift_name %></span>
-                    <span style="font-size: small;"> [ <%= schedule.start_time %> - <%= schedule.end_time %> ]</span>
-                </h5>
-            </div>
+            <div class=" order-content">
+            <h4>
+                <%= user.fullname %>,
+            </h4>
+            <h5 id="today">
+            </h5>
+            <h5>
+                <span style="font-size: small;"> Shift : <%= schedule && schedule.shift_name %></span>
+                <span style="font-size: small;"> [ <%= schedule && schedule.start_time %> - <%= schedule &&
+                            schedule.end_time %> ]</span>
+            </h5>
         </div>
+    </div>
     </div>
 </section>
 <!-- Order Delivered Box Section End -->
@@ -408,17 +409,31 @@
 
         // Membuka modal dan mengaktifkan kamera
         $('#recordButton').on('click', function () {
-            $('#attendanceModal').modal('show');
 
-            navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-                .then(function (mediaStream) {
-                    stream = mediaStream;
-                    video.srcObject = stream;
-                    video.play();
+
+            let schedule = '<%= schedule && schedule.shift_name%>';
+
+            console.log(schedule);
+            if (schedule !== '') {
+                $('#attendanceModal').modal('show');
+                navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+                    .then(function (mediaStream) {
+                        stream = mediaStream;
+                        video.srcObject = stream;
+                        video.play();
+                    })
+                    .catch(function (err) {
+                        console.log("An error occurred: " + err);
+                    });
+            } else {
+                Swal.fire({
+                    icon: "warning",
+                    title: "Your schedule is not set yet",
                 })
-                .catch(function (err) {
-                    console.log("An error occurred: " + err);
-                });
+                return
+            }
+
+
         });
 
         // Menangkap gambar
