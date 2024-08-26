@@ -20,6 +20,8 @@ router.get('/attendance/get', auth.authenticateJWT, attendanceController.getAtte
 router.get('/attendance/employee', auth.authenticateJWT, attendanceController.employee);
 router.get('/attendance/get/overtime', auth.authenticateJWT, attendanceController.getOvertime);
 router.post('/attendance/overtime/approveOrReject', auth.authenticateJWT, attendanceController.approveOrRejectOvertime);
+router.post('/attendance/employee/shift', auth.authenticateJWT, attendanceController.saveEmployeeShift);
+router.post('/attendance/sift/month', auth.authenticateJWT, attendanceController.getEmployeeSifts);
 
 // router.get('/auth/logout', authController.logout);
 // router.post('/order/getorder', auth.authenticateJWT, orderController.getorder);

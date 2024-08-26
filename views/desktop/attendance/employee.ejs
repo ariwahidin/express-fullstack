@@ -1,21 +1,304 @@
-<div class="row g-6">
-    <!-- Card Border Shadow -->
-    <div class="col-lg-3 col-sm-6">
-        <div class="card card-border-shadow-primary h-100">
-            <div class="card-body">
-                <div class="d-flex align-items-center mb-2">
-                    <div class="avatar me-4">
-                        <span class="avatar-initial rounded bg-label-primary"><i class='ti ti-truck ti-28px'></i></span>
-                    </div>
-                    <h4 class="mb-0">42</h4>
-                </div>
-                <p class="mb-1">Employees</p>
-                <p class="mb-0">
-                    <span class="text-heading fw-medium me-2">+18.2%</span>
-                    <small class="text-muted">than last week</small>
-                </p>
+<style>
+    .weekend {
+        background-color: #ffe5e5 !important;
+    }
+
+    .holiday {
+        background-color: #ffeeba !important;
+    }
+
+    .sticky-col {
+        position: sticky;
+        left: 0;
+        background-color: white;
+        /* Ensure it covers the table background */
+        z-index: 1;
+        /* Ensures it stays above other table content */
+    }
+
+    .sticky-header {
+        position: sticky;
+        top: 0;
+        background-color: white;
+        /* Ensures the header stays visible */
+        z-index: 2;
+        /* Higher z-index to stay above the sticky column */
+    }
+
+    .table-responsive {
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th,
+    td {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+
+<div class="row">
+    <div class="col-md-12">
+        <h4 class="mb-3">Employee Work Schedule</h4>
+        <!-- Select option for choosing month -->
+        <div class="mb-3">
+            <label for="monthSelect" class="form-label">Select Month</label>
+            <select id="monthSelect" class="form-select w-20">
+                <option value="" disabled selected>Select a month</option>
+                <option value="0">January</option>
+                <option value="1">February</option>
+                <option value="2">March</option>
+                <option value="3">April</option>
+                <option value="4">May</option>
+                <option value="5">June</option>
+                <option value="6">July</option>
+                <option value="7">August</option>
+                <option value="8">September</option>
+                <option value="9">October</option>
+                <option value="10">November</option>
+                <option value="11">December</option>
+            </select>
+        </div>
+
+        <!-- Table for work schedule -->
+        <div class="table-responsive card">
+            <table id="scheduleTable" class="table table-bordered">
+                <thead>
+                    <tr id="tableHeader">
+                        <th class="sticky-col sticky-header">Employee Name</th>
+                        <!-- Date headers will be generated dynamically -->
+                    </tr>
+                </thead>
+                <tbody>
+                    <% employees.forEach((employee)=> { %>
+                        <tr>
+                            <td class="sticky-col" data-employee="<%= employee.id %>">
+                                <%= employee.fullname %>
+                            </td>
+                        </tr>
+                        <% }); %>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modal for shift selection -->
+<div class="modal fade" id="shiftModal" tabindex="-1" aria-labelledby="shiftModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shiftModalLabel">Select Shift</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <form id="shiftForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="selectedEmployee" class="form-label">Employee Name</label>
+                        <input type="text" class="form-control" readonly id="selectedEmployeeName" />
+                        <input type="hidden" class="form-control" readonly id="selectedEmployee" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="shiftSelect" class="form-label">Choose Shift</label>
+                        <select id="shiftSelect" class="form-select">
+                            <% shifts.forEach((shift)=> { %>
+                                <option value="<%= shift.id %>">
+                                    <%= shift.shift_name %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <div class="mb-3 d-flex">
+                        <div class="col-6">
+                            <label for="selectedDate" class="form-label">From Date</label>
+                            <input class="form-control" type="date" id="selectedDate" />
+                        </div>
+                        <div class="col-6 ms-1">
+                            <label for="selectedDateEnd" class="form-label">To Date</label>
+                            <input class="form-control" type="date" id="selectedDateEnd" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save Shift</button>
+                </div>
+            </form>
         </div>
     </div>
-    <!--/ Card Border Shadow -->
 </div>
+
+<script>
+    $(document).ready(function () {
+
+        $('#monthSelect').on('change', function () {
+            generateTable();
+        });
+
+        // Example of holidays array (you can adjust this as needed)
+        const holidays = [
+            { month: 0, day: 1 },  // January 1st, New Year's Day
+            { month: 1, day: 25 }  // February 25th, Example Holiday
+        ];
+
+        function isHoliday(date) {
+            return holidays.some(holiday =>
+                holiday.month === date.getMonth() && holiday.day === date.getDate()
+            );
+        }
+
+        let schedule = [];
+        function generateTable() {
+            const monthSelect = document.getElementById('monthSelect');
+            const selectedMonth = monthSelect.value;
+
+            const tableHeader = document.getElementById('tableHeader');
+            tableHeader.innerHTML = '<th class="sticky-col sticky-header">Employee Name</th>';
+
+            const year = new Date().getFullYear();
+
+            const yearMonth = new Date(year, parseInt(selectedMonth));
+
+
+            $.ajax({
+                url: '<%= baseUrl %>/desktop/attendance/sift/month',
+                type: 'POST',
+                data: {
+                    yearMonth: yearMonthFormat(yearMonth)
+                },
+                dataType: 'json',
+                success: function (response) {
+                    schedules = response.schedules;
+                    schedules.forEach((s) => {
+                        s.schedule_date = formatDate(new Date(s.schedule_date));
+                    })
+
+                    const daysInMonth = new Date(year, parseInt(selectedMonth) + 1, 0).getDate();
+                    for (let day = 1; day <= daysInMonth; day++) {
+                        const date = new Date(year, selectedMonth, day);
+                        const dayOfWeek = date.getDay();
+                        const dayName = date.toLocaleDateString('en-US', { weekday: 'short' });
+
+                        const th = document.createElement('th');
+                        th.innerHTML = `${dayName}<br>${day}`; // Day name and date
+
+                        if (dayOfWeek === 0 || dayOfWeek === 6) {
+                            th.classList.add('weekend');
+                        } else if (isHoliday(date)) {
+                            th.classList.add('holiday');
+                        }
+
+                        tableHeader.appendChild(th);
+                    }
+
+                    const tableBody = document.querySelector('#scheduleTable tbody');
+                    const rows = tableBody.querySelectorAll('tr');
+
+                    rows.forEach(row => {
+                        while (row.cells.length > 1) {
+                            row.deleteCell(-1);
+                        }
+
+                        for (let day = 1; day <= daysInMonth; day++) {
+                            const date = new Date(year, selectedMonth, day);
+                            const dayOfWeek = date.getDay();
+                            const td = document.createElement('td');
+                            td.textContent = getShiftByDate(formatDate(date), row.cells[0].getAttribute('data-employee')); 
+                            td.onclick = function () {
+                                const employeeName = this.parentElement.cells[0].textContent.trim();
+                                const employeeId = this.parentElement.cells[0].getAttribute('data-employee');
+                                showShiftModal(date, employeeId, employeeName); // Show modal when cell is clicked
+                            };
+
+                            if (dayOfWeek === 0 || dayOfWeek === 6) {
+                                td.classList.add('weekend');
+                            } else if (isHoliday(date)) {
+                                td.classList.add('holiday');
+                            }
+
+                            row.appendChild(td);
+                        }
+                    });
+
+
+
+
+                }
+            })
+
+
+
+        }
+
+
+        function getShiftByDate(date, employee_id) {
+            let res = '';
+            for (let s of schedules) {
+                if (s.schedule_date == date && s.employee_id == employee_id) {
+                    res = s.shift_name;
+                    break;
+                }
+            }
+            return res;
+        }
+
+
+        function showShiftModal(date, employeeId, employeeName) {
+            const shiftModal = new bootstrap.Modal(document.getElementById('shiftModal'));
+            document.getElementById('selectedDate').value = formatDate(date);
+            document.getElementById('selectedDateEnd').value = formatDate(date);
+            document.getElementById('selectedEmployee').value = employeeId;
+            document.getElementById('selectedEmployeeName').value = employeeName;
+            shiftModal.show();
+        }
+
+        function formatDate(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const year = date.getFullYear();
+            return `${year}-${month}-${day}`;
+        }
+
+        function yearMonthFormat(date) {
+            const day = String(date.getDate()).padStart(2, '0');
+            const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+            const year = date.getFullYear();
+            return `${year}-${month}`;
+        }
+
+        function saveShift() {
+            const shift = document.getElementById('shiftSelect').value;
+            const selectedDate = document.getElementById('selectedDate').value;
+            const selectedDateEnd = document.getElementById('selectedDateEnd').value;
+
+            // console.log(`Shift: ${shift}, Date: ${selectedDate}`);
+
+            const dataToPost = {
+                employee_id: document.getElementById('selectedEmployee').value,
+                shift: shift,
+                date: selectedDate,
+                dateEnd: selectedDateEnd
+            };
+
+            $.ajax({
+                type: 'POST',
+                data: dataToPost,
+                url: '<%= baseUrl %>/desktop/attendance/employee/shift',
+                dataType: 'JSON',
+                success: function (response) {
+                    const shiftModal = bootstrap.Modal.getInstance(document.getElementById('shiftModal'));
+                    generateTable();
+                    shiftModal.hide();
+                }
+            });
+
+
+        }
+
+        $('#shiftForm').on('submit', function (event) {
+            event.preventDefault();
+            saveShift();
+        });
+    });
+</script>

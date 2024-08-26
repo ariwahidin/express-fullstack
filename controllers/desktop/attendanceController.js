@@ -74,12 +74,7 @@ exports.approveOrRejectOvertime = async (req, res) => {
     const overtimeId = req.body.overtimeId;
     const status = req.body.status; // 'approved' or 'rejected'
 
-    // console.log(req.body);
-    // console.log(req.user);
-
-    // return;
-
-    try {   
+    try {
         const [overtime] = await db.execute('SELECT * FROM employee_overtime WHERE id = ?', [overtimeId]);
 
         if (overtime.length === 0) {
@@ -95,6 +90,64 @@ exports.approveOrRejectOvertime = async (req, res) => {
     }
 };
 
-exports.employee = (req, res) => {
-    return renderView(res, 'desktop/attendance/employee', { user: req.user });
+exports.employee = async (req, res) => {
+    const [employees] = await db.execute('SELECT * FROM employee');
+    const [shifts] = await db.execute('SELECT * FROM shifts');
+    return renderView(res, 'desktop/attendance/employee', { user: req.user, employees: employees, shifts: shifts });
 };
+
+
+// Helper function to generate an array of dates between start and end dates
+function getDates(startDate, endDate) {
+    let dates = [];
+    let currentDate = new Date(startDate);
+    const end = new Date(endDate);
+
+    while (currentDate <= end) {
+        dates.push(new Date(currentDate).toISOString().split('T')[0]); // Format as YYYY-MM-DD
+        currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return dates;
+}
+
+exports.saveEmployeeShift = async (req, res) => {
+
+    const { date, dateEnd, employee_id, shift } = req.body;
+    // Validate the data
+    if (!date || !dateEnd || !employee_id || !shift) {
+        return res.status(400).json({ message: 'All fields are required' });
+    }
+
+    // Generate dates array
+    const dates = getDates(date, dateEnd);
+
+    try {
+        // Menggunakan map() untuk membuat array promises
+        const promises = await dates.map(scheduleDate => {
+            return db.execute(
+                'INSERT INTO employee_schedules (employee_id, shift_id, schedule_date) VALUES (?, ?, ?)',
+                [employee_id, shift, scheduleDate]
+            );
+        });
+
+        // Tunggu hingga semua operasi penyimpanan selesai
+        await Promise.all(promises);
+
+        res.status(201).json({ message: 'Schedules saved successfully' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error saving schedules', error });
+    }
+}
+
+exports.getEmployeeSifts = async (req, res) => {
+    const { yearMonth } = req.body;
+
+    console.log(yearMonth);
+
+    const [schedules] = await db.execute(`SELECT a.employee_id, a.schedule_date, a.shift_id, b.shift_name
+    FROM employee_schedules a
+    INNER JOIN shifts b ON a.shift_id = b.id
+    WHERE DATE_FORMAT(a.schedule_date, '%Y-%m') = ?`, [yearMonth]);
+    res.status(200).json({ schedules });
+}
