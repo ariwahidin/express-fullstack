@@ -1,0 +1,16 @@
+<table id="scheduleTable" class="table table-bordered">
+    <thead>
+        <tr id="tableHeader">
+            <th class="sticky-col sticky-header">Employee Name</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% employees.forEach((employee)=> { %>
+            <tr>
+                <td class="sticky-col" data-employee="<%= employee.id %>">
+                    <%= employee.fullname %>
+                </td>
+            </tr>
+            <% }); %>
+    </tbody>
+</table>

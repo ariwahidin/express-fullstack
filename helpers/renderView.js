@@ -5,11 +5,11 @@ module.exports = function renderView(res, view, options) {
     // console.log(res.req.user);
     // console.log(baseUrl);
 
-    console.log(res.req.ip);
+    // console.log(res.req.ip);
     try {
         // Cek apakah permintaan adalah AJAX
         const fullUrl = res.req.protocol + '://' + res.req.get('host') + res.req.originalUrl;
-        console.log(fullUrl);
+
         if (res.req.xhr) {
             // Jika permintaan adalah AJAX, render view sebagai string HTML dan kirim sebagai JSON
             res.render(view, options, (err, html) => {

@@ -1,0 +1,36 @@
+<table class="table">
+    <thead class="table-dark">
+        <tr>
+            <th>No.</th>
+            <th>Fullname</th>
+            <th>Username</th>
+            <th>Employee ID</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody class="table-border-bottom-0">
+
+        <% results.forEach(function(user, index) { %>
+
+        <tr>
+            <td><%= index+1 %></td>
+            <td><%= user.fullname %></td>
+            <td><%= user.username %></td>
+            <td><%= user.employee_id %></td>
+            <td>
+                <div class="dropdown">
+                    <button type="button" class="btn p-0 dropdown-toggle hide-arrow"
+                        data-bs-toggle="dropdown"><i class="ti ti-dots-vertical"></i></button>
+                    <div class="dropdown-menu">
+                        <a class="dropdown-item editUser" href="javascript:void(0);" data-user="<%= JSON.stringify(user) %>"><i
+                                class="ti ti-pencil me-1"></i> Edit</a>
+                        <a class="dropdown-item delUser" href="javascript:void(0);" data-id="<%= user.id %>"><i
+                                class="ti ti-trash me-1"></i> Delete</a>
+                    </div>
+                </div>
+            </td>
+        </tr>
+
+        <% }); %>
+    </tbody>
+</table>

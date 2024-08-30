@@ -63,7 +63,12 @@ app.use(baseUrl + '/attendance', attendanceRoutes);
 
 
 // desktop
-app.use(baseUrl + '/desktop', desktopRoutes);
+app.use(baseUrl + '/desktop', (req, res, next) => {
+    res.set('Cache-Control', 'no-store');
+    next();
+}, desktopRoutes);
+
+
 // API for Asics
 // app.use(baseUrl + '/api/asics');
 

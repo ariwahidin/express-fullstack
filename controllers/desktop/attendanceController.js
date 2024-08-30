@@ -3,12 +3,11 @@ const renderView = require('../../helpers/renderView');
 const moment = require('moment-timezone');
 const db = require('../../database');
 
-exports.indexOld = (req, res) => {
-    return viewDesktop(res, 'attendance/index', { title: 'Attendance', user: req.user });
-};
+// exports.indexOld = (req, res) => {
+//     return viewDesktop(res, 'attendance/index', { title: 'Attendance', user: req.user });
+// };
 
 exports.index = (req, res) => {
-    console.log(req.user);
     return renderView(res, 'desktop/attendance/index', { title: 'Attendance', user: req.user });
 };
 
@@ -90,14 +89,46 @@ exports.approveOrRejectOvertime = async (req, res) => {
     }
 };
 
-exports.employee = async (req, res) => {
+exports.employeeSchedule = async (req, res) => {
     const [employees] = await db.execute('SELECT * FROM employee');
     const [shifts] = await db.execute('SELECT * FROM shifts');
     return renderView(res, 'desktop/attendance/employee', { user: req.user, employees: employees, shifts: shifts });
 };
 
+exports.employeTable = async (req, res) => {
 
-// Helper function to generate an array of dates between start and end dates
+    console.log(req.body);
+
+    const { employeeId } = req.body;
+
+    try {
+
+        let sql = `SELECT * FROM employee`;
+        if (employeeId != 'All') {
+            sql = `SELECT * FROM employee WHERE id = ${employeeId}`;
+        } 
+
+        const [results] = await db.execute(sql);
+
+
+        // Render tabel sebagai string HTML menggunakan EJS
+        res.render('desktop/attendance/table_employee', { employees: results }, (err, html) => {
+            if (err) {
+                console.log(err);
+                res.status(500).json({ success: false, message: 'Gagal merender tabel employee' });
+                return;
+            }
+            // Kirim HTML tabel sebagai respons JSON
+            res.status(200).json({ success: true, table: html });
+        });
+
+
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, message: 'Gagal mengambil data employee' });
+    }
+};
+
 function getDates(startDate, endDate) {
     let dates = [];
     let currentDate = new Date(startDate);
@@ -114,7 +145,6 @@ function getDates(startDate, endDate) {
 exports.saveEmployeeShift = async (req, res) => {
 
     const { date, dateEnd, employee_id, shift } = req.body;
-    // Validate the data
     if (!date || !dateEnd || !employee_id || !shift) {
         return res.status(400).json({ message: 'All fields are required' });
     }
@@ -123,20 +153,44 @@ exports.saveEmployeeShift = async (req, res) => {
     const dates = getDates(date, dateEnd);
 
     try {
-        // Menggunakan map() untuk membuat array promises
-        const promises = await dates.map(scheduleDate => {
-            return db.execute(
-                'INSERT INTO employee_schedules (employee_id, shift_id, schedule_date) VALUES (?, ?, ?)',
-                [employee_id, shift, scheduleDate]
-            );
+        const promises = dates.map(async (scheduleDate) => {
+            const [rows] = await db.execute(`SELECT * FROM employee_schedules WHERE employee_id = ? AND schedule_date = ?`, [employee_id, scheduleDate]);
+
+            if (rows.length > 0) {
+                return db.execute('UPDATE employee_schedules SET shift_id = ? WHERE id = ?', [shift, rows[0].id]);
+            } else {
+                return db.execute(
+                    'INSERT INTO employee_schedules (employee_id, shift_id, schedule_date) VALUES (?, ?, ?)',
+                    [employee_id, shift, scheduleDate]
+                );
+            }
+
         });
 
-        // Tunggu hingga semua operasi penyimpanan selesai
         await Promise.all(promises);
 
-        res.status(201).json({ message: 'Schedules saved successfully' });
+        // After all operations are done, select the data based on the date range
+        const [results] = await db.execute(
+            `SELECT a.*, b.shift_name FROM employee_schedules a 
+            INNER JOIN shifts b ON a.shift_id = b.id
+            WHERE employee_id = ? AND schedule_date 
+            BETWEEN ? AND ? ORDER BY schedule_date`,
+            [employee_id, date, dateEnd]
+        );
+
+        results.map((res) => {
+            res.schedule_date = moment(res.schedule_date).format('YYYY-MM-DD');
+        });
+
+        // Send the results to the client
+        res.status(201).json({
+            success: true,
+            message: 'Schedules saved successfully',
+            schedules: results,
+        });
+
     } catch (error) {
-        res.status(500).json({ message: 'Error saving schedules', error });
+        res.status(500).json({ success: false, message: 'Error saving schedules', error });
     }
 }
 

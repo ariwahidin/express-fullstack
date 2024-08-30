@@ -1,0 +1,172 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<div class="row g-6">
+    <div class="col-lg-5 mb-6 mb-md-0">
+        <div class="card">
+            <h5 class="card-header" id="formTitle">Form Add Users</h5>
+            <div class="card-body">
+                <form id="formAddUser" method="post" class="browser-default-validation">
+                    <div class="mb-6">
+                        <label class="form-label" for="basic-default-name">Fullname</label>
+                        <input type="text" class="form-control" id="fullname" name="fullname" placeholder="John Doe"
+                            required="">
+                        <input type="hidden" class="form-control" id="user_id" name="user_id">
+                        <input type="hidden" class="form-control" id="process" value="add">
+                    </div>
+                    <div class="mb-6">
+                        <label class="form-label" for="basic-default-email">Username</label>
+                        <input type="text" class="form-control" id="username" name="username" placeholder="john.doe"
+                            required="">
+                    </div>
+                    <div class="mb-6">
+                        <label class="form-label" for="basic-default-email">Email</label>
+                        <input type="email" id="email" class="form-control" name="email" placeholder="john.doe"
+                            required="">
+                    </div>
+                    <div class="mb-6 form-password-toggle">
+                        <label class="form-label" for="basic-default-password">Password</label>
+                        <div class="input-group input-group-merge">
+                            <input type="password" id="password" class="form-control" name="password"
+                                placeholder="············" aria-describedby="basic-default-password3" required="">
+                            <span class="input-group-text cursor-pointer" id="basic-default-password3"><i
+                                    class="ti ti-eye-off"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-12">
+                            <button type="button" class="btn btn-secondary waves-effect waves-light"
+                                id="btnClear">Clear</button>
+                            <button type="submit" class="btn btn-primary waves-effect waves-light"
+                                id="btnSubmit">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-lg-7 mb-6 mb-md-0">
+        <div class="card">
+            <h5 class="card-header">Users Table</h5>
+            <div class="table-responsive text-nowrap" id="userTable">
+
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#formAddUser').on('submit', function (e) {
+            e.preventDefault();
+
+
+            const process = $('#process').val();
+            let url = '<%= baseUrl %>/desktop/user/add';
+            if (process == 'update') {
+                url = '<%= baseUrl %>/desktop/user/update';
+            }
+
+            $.ajax({
+                type: 'POST',
+                url: url,
+                data: $(this).serialize(),
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success == true) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message,
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                        getUser();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: data.message,
+                        });
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    Swal.fire({
+                        icon: 'error',
+                        title: data.responseJSON.message,
+                    });
+                }
+            })
+        })
+
+        function getUser() {
+            $.ajax({
+                type: "GET",
+                url: `<%= baseUrl %>/desktop/user/table`,
+                success: function (response) {
+                    $('#userTable').html(response.table);
+                }
+            });
+        }
+        getUser();
+
+        $('#userTable').on('click', '.delUser', function () {
+            const user_id = $(this).data('id');
+            $.ajax({
+                type: 'POST',
+                url: '<%=baseUrl%>/desktop/user/delete',
+                data: {
+                    user_id: user_id
+                },
+                dataType: 'json',
+                success: function (data) {
+                    if (data.success == true) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: data.message,
+                        });
+                        getUser();
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: data.message,
+                        });
+                    }
+                },
+                error: function (data) {
+                    console.log(data);
+                    Swal.fire({
+                        icon: 'error',
+                        title: data.responseJSON.message,
+                    });
+                }
+            })
+        })
+
+        $('#userTable').on('click', '.editUser', function () {
+            const user = $(this).data('user');
+
+            $('#fullname').val(user.fullname);
+            $('#username').val(user.username);
+            $('#email').val(user.email);
+            $('#user_id').val(user.id);
+            $('#process').val('update');
+            $('#btnSubmit').text('Update');
+            $('#formTitle').text('Form Update Users');
+            $('#password').attr('required', false);
+        })
+
+        $('#btnClear').on('click', function () {
+            $('#fullname').val('');
+            $('#username').val('');
+            $('#email').val('');
+            $('#user_id').val('');
+            $('#process').val('add');
+            $('#btnSubmit').text('Submit');
+            $('#formTitle').text('Form Add Users');
+            $('#password').attr('required', true);
+            $('#password').val('');
+        })
+    })
+</script>

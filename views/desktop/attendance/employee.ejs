@@ -39,46 +39,43 @@
 
 <div class="row">
     <div class="col-md-12">
-        <h4 class="mb-3">Employee Work Schedule</h4>
+        <!-- <h4 class="mb-3">Employee Work Schedule</h4> -->
         <!-- Select option for choosing month -->
-        <div class="mb-3">
-            <label for="monthSelect" class="form-label">Select Month</label>
-            <select id="monthSelect" class="form-select w-20">
-                <option value="" disabled selected>Select a month</option>
-                <option value="0">January</option>
-                <option value="1">February</option>
-                <option value="2">March</option>
-                <option value="3">April</option>
-                <option value="4">May</option>
-                <option value="5">June</option>
-                <option value="6">July</option>
-                <option value="7">August</option>
-                <option value="8">September</option>
-                <option value="9">October</option>
-                <option value="10">November</option>
-                <option value="11">December</option>
-            </select>
+        <div class="d-flex">
+            <div class="mb-3 me-2">
+                <label for="monthSelect" class="form-label">Select User</label>
+                <select id="userSelect" class="form-select w-200">
+                    <option value="All" selected>All</option>
+                    <% employees.forEach(employee=> { %>
+                        <option value="<%= employee.id %>">
+                            <%= employee.fullname %>
+                        </option>
+                        <% }); %>
+                </select>
+            </div>
+            <div class="mb-3"">
+                <label for=" monthSelect" class="form-label">Select Month</label>
+                <select id="monthSelect" class="form-select w-200">
+                    <option value="" disabled selected>Select a month</option>
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+            </div>
         </div>
 
         <!-- Table for work schedule -->
-        <div class="table-responsive card">
-            <table id="scheduleTable" class="table table-bordered">
-                <thead>
-                    <tr id="tableHeader">
-                        <th class="sticky-col sticky-header">Employee Name</th>
-                        <!-- Date headers will be generated dynamically -->
-                    </tr>
-                </thead>
-                <tbody>
-                    <% employees.forEach((employee)=> { %>
-                        <tr>
-                            <td class="sticky-col" data-employee="<%= employee.id %>">
-                                <%= employee.fullname %>
-                            </td>
-                        </tr>
-                        <% }); %>
-                </tbody>
-            </table>
+        <div class="table-responsive card" id="scheduleTable">
+
         </div>
 
     </div>
@@ -204,7 +201,8 @@
                             const date = new Date(year, selectedMonth, day);
                             const dayOfWeek = date.getDay();
                             const td = document.createElement('td');
-                            td.textContent = getShiftByDate(formatDate(date), row.cells[0].getAttribute('data-employee')); 
+                            td.setAttribute('id', formatDate(date) + '-' + row.cells[0].getAttribute('data-employee'));
+                            td.textContent = getShiftByDate(formatDate(date), row.cells[0].getAttribute('data-employee'));
                             td.onclick = function () {
                                 const employeeName = this.parentElement.cells[0].textContent.trim();
                                 const employeeId = this.parentElement.cells[0].getAttribute('data-employee');
@@ -281,18 +279,27 @@
                 dateEnd: selectedDateEnd
             };
 
+
             $.ajax({
                 type: 'POST',
                 data: dataToPost,
                 url: '<%= baseUrl %>/desktop/attendance/employee/shift',
                 dataType: 'JSON',
                 success: function (response) {
-                    const shiftModal = bootstrap.Modal.getInstance(document.getElementById('shiftModal'));
-                    generateTable();
-                    shiftModal.hide();
+
+                    if (response.success == true) {
+                        const shiftModal = bootstrap.Modal.getInstance(document.getElementById('shiftModal'));
+                        const schedules = response.schedules;
+
+                        schedules.map((s) => {
+                            $('#' + s.schedule_date + '-' + s.employee_id).text(s.shift_name);
+                        });
+
+
+                        shiftModal.hide();
+                    }
                 }
             });
-
 
         }
 
@@ -300,5 +307,37 @@
             event.preventDefault();
             saveShift();
         });
+
+        $('#userSelect').on('change', function () {
+            const employeeId = $(this).val();
+            const employeeName = $(this).find(':selected').text();
+
+            console.log(employeeId);
+            console.log(employeeName);
+
+            getSchedule();
+        })
+
+
+        function getSchedule() {
+
+            let employeeId = $('#userSelect').val();
+            if (employeeId == 'All') {
+                employeeId = 'All';
+            }
+
+            $.ajax({
+                type: "POST",
+                data: {
+                    employeeId: employeeId
+                },
+                url: `<%= baseUrl %>/desktop/attendance/employee/table`,
+                success: function (response) {
+                    $('#scheduleTable').html(response.table);
+                    generateTable();
+                }
+            });
+        }
+        getSchedule();
     });
 </script>
